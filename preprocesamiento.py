@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import os
 
-CARPETA_DATOS_ORIGINALES = 'datos/Originales/'
+CARPETA_DATOS_ORIGINALES = 'Datos/Originales/'
 df_sabi_1= pd.read_excel(os.path.join(CARPETA_DATOS_ORIGINALES, 'df_sabi_modif_1.xlsx'))
 df_sabi_2= pd.read_excel(os.path.join(CARPETA_DATOS_ORIGINALES, 'df_sabi_modif_2.xlsx'))
 df_dealroom= pd.read_excel(os.path.join(CARPETA_DATOS_ORIGINALES, 'df_dealroom_modif.xlsx'))
