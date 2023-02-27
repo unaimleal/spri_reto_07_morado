@@ -36,15 +36,15 @@ def cambio_orden_variable(df, variable, variable_anterior):
 
 def imputacion_reg_lineal(df, var_dependiente, var_independiente):
     """
-    Imputa valores faltantes en una variable dependiente de un dataframe utilizando regresión lineal.
+    Imputa valores ausentes en una variable dependiente de un dataframe utilizando regresión lineal.
     
     Args:
     - df: El dataframe a modificar.
-    - var_dependiente (str): El nombre de la variable dependiente con valores faltantes a imputar.
-    - var_independiente (str): El nombre de la variable independiente que se utilizará para predecir los valores faltantes.
+    - var_dependiente (str): El nombre de la variable dependiente con valores ausentes a imputar.
+    - var_independiente (str): El nombre de la variable independiente que se utilizará para predecir los valores ausentes.
     
     Returns:
-    - df: El dataframe modificado, con los valores faltantes de la variable dependiente imputados.
+    - df: El dataframe modificado, con los valores ausentes de la variable dependiente imputados.
     """
     missings = df[df[var_dependiente].isna()]
     no_missings = df.dropna(subset=[var_dependiente])
@@ -53,4 +53,24 @@ def imputacion_reg_lineal(df, var_dependiente, var_independiente):
     prediccion = modelo.predict(missings[[var_independiente]])
     df.loc[df[var_dependiente].isna(), var_dependiente] = prediccion
 
+    return df
+
+
+def imputacion_groupby(df, columna):
+    """
+    Rellena los valores missings de una columna en un dataframe con la mediana de los valores no missings 
+    de esa columna, agrupando por otra columna específica.
+    
+    Parámetros:
+    -----------
+    - df : Dataframe en el que se buscará la columna especificada para rellenar los valores ausentes.
+    - columna : str
+        Nombre de la columna que se rellenará con la mediana de sus valores no ausentes.
+        
+    Retorna:
+    --------
+    - df : El dataframe original con la columna especificada actualizada, rellenando sus valores ausentes con 
+        la mediana de los valores no ausentes de esa columna, agrupando por otra columna específica.
+    """
+    df[columna] = df[columna].fillna(df.groupby('Codigo primario CNAE adaptado')[columna].transform('median'))
     return df

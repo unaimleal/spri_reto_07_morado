@@ -85,13 +85,15 @@ df['last_funding_date']=pd.to_datetime(df['last_funding_date'], format='%Y/%m/%d
 # cuando el total_funding es 0, el last_funding tambii©n lo imputamos como 0
 df.loc[df['total_funding']==0, 'last_funding']=0
 
+
 # CREACION DE VARIABLES
 #creamos una variable para conocer los años que lleva la empresa en el mercado
 df['Anos en Mercado']= (2023-df['Fecha constitucion'].dt.year)
 df['Años desde ultima finanziacion']= (2023-df['last_funding_date'].dt.year).fillna(0).astype(int)
 df['ratio_last_funding']=df['last_funding']/df['total_funding']
 
-
+# se crea una variable dummy para saber si la empresa es una sociedad anonima o no
+df['Sociedad_anonima']= df['Forma juridica'].apply(lambda x: 1 if 'Sociedad anonima' in x else 0)
 
 # se utiliza funcion para cambiar el orden de las columnas creadas
 df= funciones_limpieza.cambio_orden_variable(df, 'Anos en Mercado', 'Fecha constitucion')
@@ -101,6 +103,9 @@ df= funciones_limpieza.cambio_orden_variable(df, 'Anos desde ultima finanziacion
 # REEMPLAZO DE VALORES AUSENTES
 # hay 10 valores que no hay en la columna de sabi, pero si en la de dealroom, por lo que se pasan
 df['Numero empleados']= df.loc[:,'Numero empleados'].fillna(df['n_empleados_dealroom'])
+
+# se rellenan los valores de sociedades anonimas con 0 porque la mayoría son sociedades limitadas
+df['Sociedad_anonima'] = df['Sociedad_anonima'].fillna(0)
 
 # Primero con formulas financieras
 
@@ -168,10 +173,20 @@ df= df.drop(variables_eliminar, axis=1)
 df.loc[df['growth_stage'].isna(), 'growth_stage']= 0 # se asigna el valor más común
 df.loc[df['Deudores mil EUR'].isna(), 'Deudores mil EUR']= 0 # se considera que no hay deudores
 
-# AQUI VAN LAS IMPUTACIONES POR GROUPBY Y UNA POR REGRESION LINEAL
+# para imputar coste medio de los empleados, se agrupa por CNAE y se calcula el coste medio
+df['Codigo primario CNAE adaptado']= df['Codigo primario CNAE 2009'].apply(lambda x: round(x/100,0))
 
+col = ['Coste medio de los empleados mil', 'Costes de los trabajadores / Ingresos de explotacion (%) %', 'Deudas financieras mil EUR', 'Acreedores a L. P. mil EUR',
+       'Acreedores comerciales mil EUR', 'Periodo de cobro (dias) dias', 'Margen de beneficio (%) %']
+for col in columnas:
+    df= funciones_limpieza.imputacion_groupby(df, col)
 
+df= df.drop('Codigo primario CNAE adaptado', axis=1)
 
+# se imputan los ingresos de explotacion
+funciones_limpieza.imputacion_reg_lineal(df, 'Ingresos de explotacion mil EUR', 'Deudores mil EUR')
+
+# se imputan los costes de los trabajadores y el numero de empleados
 df['Coste medio de los empleados mil']=df['Coste medio de los empleados mil'].fillna(df['Costes de los trabajadores / Ingresos de explotacion (%) %']* df['Ingresos de explotacion mil EUR']/100/df['Numero empleados'])
 df['Numero empleados']=df['Numero empleados'].fillna(round((df['Costes de los trabajadores / Ingresos de explotacion (%) %']* df['Ingresos de explotacion mil EUR']/100/df['Coste medio de los empleados mil']),0))
 df['Gastos de personal mil EUR']= df['Gastos de personal mil EUR'].fillna(df['Coste medio de los empleados mil']*df['Numero empleados'])
@@ -179,13 +194,13 @@ df['Gastos de personal mil EUR']= df['Gastos de personal mil EUR'].fillna(df['Co
 # se crea el margen bruto solamente con los costes de los trabajadores ahora que ya se han imputado
 df.loc[:,'Margen_bruto(costes trabajadores)']=(df['Ingresos de explotacion mil EUR']-df['Coste medio de los empleados mil'])/(df['Ingresos de explotacion mil EUR']*100)
 
-
-
-# AQUI EL RESTO DE IMPUTACIONES POR REGRESION LINEAL
-
-
-
-
+# importe neto de ventas con ingresos de explotacion
+funciones_limpieza.imputacion_reg_lineal(df, 'Importe neto Cifra de Ventas mil EUR', 'Ingresos de explotacion mil EUR')
+# total funding con gastos financieros
+funciones_limpieza.imputacion_reg_lineal(df, 'Deudas financieras mil EUR', 'Total pasivo')
+funciones_limpieza.imputacion_reg_lineal(df, 'total_funding', 'Gastos financieros mil EUR')
+funciones_limpieza.imputacion_reg_lineal(df, 'Acreedores comerciales mil EUR', 'Deudas financieras mil EUR')
+funciones_limpieza.imputacion_reg_lineal(df, 'Acreedores a L. P. mil EUR', 'Gastos financieros mil EUR')
 
 # hay 3 valores de importe neto de ventas que son menores que 0, así que se ponen en positivo
 df.loc[df['Importe neto Cifra de Ventas mil EUR']<0, 'Importe neto Cifra de Ventas mil EUR']= \
