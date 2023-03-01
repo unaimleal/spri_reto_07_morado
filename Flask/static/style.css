@@ -19,7 +19,7 @@
   --teal: #20c997;
   --cyan: #17a2b8;
   --white: #fff;
-  --gray: #6c757d;
+  --gray: rgb(180, 173, 173);
   --gray-dark: #343a40;
   --primary: #E45F4E;
   --secondary: #262626;
@@ -4144,10 +4144,10 @@ input[type=button].btn-block {
 }
 
 .navbar-light .navbar-brand {
-  color: rgba(0, 0, 0, 0.9);
+  color: rgba(179, 142, 142, 0.9);
 }
 .navbar-light .navbar-brand:hover, .navbar-light .navbar-brand:focus {
-  color: rgba(0, 0, 0, 0.9);
+  color: rgba(165, 113, 113, 0.9);
 }
 .navbar-light .navbar-nav .nav-link {
   color: rgba(0, 0, 0, 0.5);
@@ -4156,13 +4156,13 @@ input[type=button].btn-block {
   color: rgba(0, 0, 0, 0.7);
 }
 .navbar-light .navbar-nav .nav-link.disabled {
-  color: rgba(0, 0, 0, 0.3);
+  color: rgb(80, 76, 76);
 }
 .navbar-light .navbar-nav .show > .nav-link,
 .navbar-light .navbar-nav .active > .nav-link,
 .navbar-light .navbar-nav .nav-link.show,
 .navbar-light .navbar-nav .nav-link.active {
-  color: rgba(0, 0, 0, 0.9);
+  color: rgba(151, 122, 122, 0.9);
 }
 .navbar-light .navbar-toggler {
   color: rgba(0, 0, 0, 0.5);
@@ -5806,7 +5806,7 @@ button.bg-primary:focus {
 }
 
 .bg-secondary {
-  background-color: #262626 !important;
+  background-color:  rgb(109, 105, 105) !important;
 }
 
 a.bg-secondary:hover, a.bg-secondary:focus,
