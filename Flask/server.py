@@ -10,6 +10,6 @@ def home():
 @app.route('/importarcsv', methods=['GET','POST'])
 def importarcsv():
     return render_template('csv.html')
-##262626
+
 if __name__ == "__main__":
     app.run(debug = True)
