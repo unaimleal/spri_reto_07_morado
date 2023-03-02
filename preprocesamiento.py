@@ -14,7 +14,7 @@ df_sabi_3_final= df_sabi_3[['Codigo_NIF','year', 'Gastos de personal mil EUR', '
 
 # pasamos el n.s. a NaN con applymap
 df_sabi_2=df_sabi_2.applymap(lambda x: np.nan if x=='n.s.' else x)
-df_sabi_3=df_sabi_3.applymap(lambda x: np.nan if x=='n.s.' else x)
+df_sabi_3_final=df_sabi_3_final.applymap(lambda x: np.nan if x=='n.s.' else x)
 
 # se crea una columna con numero de missing por fila
 df_sabi_2['n_missings']= df_sabi_2.isna().sum(axis=1)
@@ -89,7 +89,7 @@ df.loc[df['total_funding']==0, 'last_funding']=0
 # CREACION DE VARIABLES
 #creamos una variable para conocer los años que lleva la empresa en el mercado
 df['Anos en Mercado']= (2023-df['Fecha constitucion'].dt.year)
-df['Años desde ultima finanziacion']= (2023-df['last_funding_date'].dt.year).fillna(0).astype(int)
+df['Anos desde ultima finanziacion']= (2023-df['last_funding_date'].dt.year).fillna(0).astype(int)
 df['ratio_last_funding']=df['last_funding']/df['total_funding']
 
 # se crea una variable dummy para saber si la empresa es una sociedad anonima o no
@@ -117,7 +117,7 @@ df['Pasivo fijo mil EUR']=df['Pasivo fijo mil EUR'].fillna(df['Total pasivo y ca
 df['Pasivo liquido mil EUR']=df['Pasivo liquido mil EUR'].fillna(df['Total pasivo y capital propio mil EUR'].fillna(0)-df['Pasivo fijo mil EUR'].fillna(0)-df['Fondos propios mil EUR'].fillna(0))
 df['Total pasivo']=df['Pasivo fijo mil EUR']+df['Pasivo liquido mil EUR']
 
-df['Numero empleados']=df['Numero empleados'].fillna(df['Gastos de personal mil EUR']/df['Coste medio de los empleados mil'])
+df['Numero empleados']=df['Numero empleados'].fillna(df['Gastos de personal mil EUR']/(df['Coste medio de los empleados mil']).astype(float, errors='ignore'))
 df['Coste medio de los empleados mil']=df['Coste medio de los empleados mil'].fillna(df['Gastos de personal mil EUR']/df['Numero empleados'])
 df['Gastos de personal mil EUR']=df['Gastos de personal mil EUR'].fillna(df['Numero empleados']*df['Coste medio de los empleados mil'])
 df['Impuestos sobre sociedades mil EUR']=df['Impuestos sobre sociedades mil EUR'].fillna(df['Result. ordinarios antes Impuestos mil EUR']-df['Resultado Actividades Ordinarias mil EUR'])
@@ -145,6 +145,9 @@ df= df.drop(lista_columnas, axis=1)
 df.loc[df['Pasivo fijo mil EUR']<0, 'Pasivo fijo mil EUR']=0
 df.loc[df['Pasivo liquido mil EUR']<0, 'Pasivo liquido mil EUR']=0
 
+# se crea un df que tiene missings para probarlo con modelos a los que no les importan los missings
+df_missings= df.copy()
+
 # se actualiza la lista de variables financieras
 variables_financieras_eliminadas= ['Resultado Actividades Ordinarias mil EUR', 'Inmovilizado material mil EUR',
  'Inmovilizado inmaterial mil EUR', 'Existencias mil EUR', 'Rotacion de las existencias %', 
@@ -167,8 +170,9 @@ for nif in df['Codigo_NIF'].unique():
             df.loc[(df['Codigo_NIF']==nif) & (df['year']==2021), columna]=df.loc[(df['Codigo_NIF']==nif) & (df['year']==2020), columna].values[0]
 
 # se eliminan mas variables
-variables_eliminar= ['ratio_last_funding','last_round', 'last_funding', 'ownerships', 'Tesoreria mil EUR', 'n_missings' ]
+variables_eliminar= ['ratio_last_funding','last_round', 'last_funding', 'ownerships', 'Tesoreria mil EUR' ]
 df= df.drop(variables_eliminar, axis=1)
+df_missings= df_missings.drop(variables_eliminar, axis=1)
 
 df.loc[df['growth_stage'].isna(), 'growth_stage']= 0 # se asigna el valor más común
 df.loc[df['Deudores mil EUR'].isna(), 'Deudores mil EUR']= 0 # se considera que no hay deudores
@@ -178,7 +182,7 @@ df['Codigo primario CNAE adaptado']= df['Codigo primario CNAE 2009'].apply(lambd
 
 col = ['Coste medio de los empleados mil', 'Costes de los trabajadores / Ingresos de explotacion (%) %', 'Deudas financieras mil EUR', 'Acreedores a L. P. mil EUR',
        'Acreedores comerciales mil EUR', 'Periodo de cobro (dias) dias', 'Margen de beneficio (%) %']
-for col in columnas:
+for columna in col:
     df= funciones_limpieza.imputacion_groupby(df, col)
 
 df= df.drop('Codigo primario CNAE adaptado', axis=1)
@@ -219,63 +223,14 @@ df=df.applymap(lambda x: -99999 if x== -np.inf else x)
 
 
 # CREACION DE LOS 2 DFS FINALES PARA LOS MODELOS
-# DF_ADQUISICION
-df_pivotado= df.pivot_table(index='Codigo_NIF', columns='year', values=columnas_financieras_completas,)
-df_pivotado_columnas= df_pivotado.columns
-df_pivotado_copia= df_pivotado.copy()
 
-# se pasan las columnas de los años de df_pivotado como sufijo de las columnas de df_pivotado
-df_pivotado.columns= df_pivotado.columns.map('{0[0]}_{0[1]}'.format)
-df_pivotado= df_pivotado.reset_index()
-# luego se añaden el resto de columnas de df seleccionando las que no estan en df_pivotado
-columnas= columnas_financieras_completas.tolist()
-df_adquisicion_completo= pd.merge(df_pivotado, df.loc[:,~df.columns.isin(columnas)], on= 'Codigo_NIF', how='left')
-
-# se quita 1 de cada 2 filas porque hay duplicados
-df_adquisicion_completo= df_adquisicion_completo.drop_duplicates(subset='Codigo_NIF', keep='first')
-
-# se crea otro df quitando las columnas de 2020
-df_adquisicion_2021= df_adquisicion_completo.drop(df_adquisicion_completo.filter(regex='_2020').columns, axis=1)
-
-# se calcula el ratio de crecimiento de las variables financieras entre 2020 y 2021
-df_pivotado_ratios= pd.DataFrame()
-for col in df_pivotado_columnas.get_level_values(0):
-    df_pivotado_ratios[col+'_ratio']=df_pivotado_copia[col][2021]/df_pivotado_copia[col][2020]
-df_pivotado_ratios= df_pivotado_ratios.reset_index()
-
-# se junta el df de ratios con el df de adquisicion
-df_adquisicion_final= pd.merge(df_pivotado_ratios,df_adquisicion_2021 , on='Codigo_NIF', how='left')
-df_adquisicion_final=df_adquisicion_final.applymap(lambda x: 99999 if x== np.inf else x)
-df_adquisicion_final=df_adquisicion_final.applymap(lambda x: -99999 if x== -np.inf else x)
-df_adquisicion_final= df_adquisicion_final.fillna(0)
-
+df_adquisicion, df_valoracion =funciones_limpieza.creacion_dfs_finales(df, columnas_financieras_completas)
+df_adquisicion_missings, df_valoracion_missings =funciones_limpieza.creacion_dfs_finales(df_missings, columnas_financieras_completas)
 
 # DF_GRAFICOS
 # otro df especial solo para graficos porque tiene la variable de localidad
-df_graficos= df_adquisicion_final.copy()
+df_graficos= df_adquisicion.copy()
 df_graficos['Localidad']= localidad
-
-
-# DF_VALORACION
-# Primero se crea el df que estA preparado para hacer el modelo de valoracion de empresas
-# se busca cuando valoracion no es na
-df_valoracion= df_adquisicion_final[df_adquisicion_final['valuation_2022']!=0]
-
-# ahora que se ha creado el df de valoracion, se quita la columna de valoracion del df de adquisicion
-df_adquisicion_final= df_adquisicion_final.drop('valuation_2022', axis=1)
-
-# se quita la segunda instancia de cada empresa y se queda con la del 2021
-df_valoracion= df_valoracion.drop_duplicates(subset='Codigo_NIF', keep='first')
-df_valoracion= df_valoracion.drop('year', axis=1)
-df_valoracion.shape
-
-# Se RalizaN estos calculos si alguna de estas columnas es nula, y se sustituye el valor nulo por el calculado
-df_valoracion.loc[:,'Precio/Venta']=(df_valoracion['valuation_2022']/df_valoracion['Importe neto Cifra de Ventas mil EUR_2021'])
-df_valoracion.loc[:,'Precio/Ebitda']=(df_valoracion['valuation_2022']/df_valoracion['EBITDA mil EUR_2021'])
-df_valoracion.loc[:,'Precio/Ebit']=(df_valoracion['valuation_2022']/df_valoracion['EBIT mil EUR_2021'])
-
-# Se reemplazan valores infinitos con valores altos.
-df_valoracion.loc[:,'Precio/Venta']=df_valoracion['Precio/Venta'].replace([np.inf, -np.inf], [99999, -99999])
 
 
 # CREACION DE CSVS
@@ -284,11 +239,18 @@ CARPETA_DATOS_LIMPIOS = 'Datos/Limpios/'
 if not os.path.exists(CARPETA_DATOS_LIMPIOS):
     os.makedirs(CARPETA_DATOS_LIMPIOS)
 
+
 # se guarda el df de adquisicion
-df_adquisicion_final.to_csv(CARPETA_DATOS_LIMPIOS + 'df_adquisicion_final.csv', index=False)
+df_adquisicion.to_csv(CARPETA_DATOS_LIMPIOS + 'df_adquisicion.csv', index=False)
 
 # se guarda el df de valoracion
 df_valoracion.to_csv(CARPETA_DATOS_LIMPIOS + 'df_valoracion.csv', index=False)
+
+# se guarda el df de adquisicion con missings
+df_adquisicion_missings.to_csv(CARPETA_DATOS_LIMPIOS + 'df_adquisicion_missings.csv', index=False)
+
+# se guarda el df de valoracion con missings
+df_valoracion_missings.to_csv(CARPETA_DATOS_LIMPIOS + 'df_valoracion_missings.csv', index=False)
 
 # se guarda el df de graficos
 df_graficos.to_csv(CARPETA_DATOS_LIMPIOS + 'df_graficos.csv', index=False)
