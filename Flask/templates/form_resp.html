@@ -1,0 +1,16 @@
+{%extends "layout.html" %}
+
+{%block cuerpo%} 
+
+<header id="home" class="header" style="background-image: url('static/main.jpg')">
+    <div class="overlay text-white text-center"> 
+        <h2><strong>{{mens}}</strong></h2><br>
+
+        <a class="btn btn-lg btn-primary" href = "{{url_for('graf')}}">¿Cuántos restaurantes premiados hay en mi ciudad?</a><br>
+        <a class="btn btn-lg btn-primary" href = "{{url_for('index')}}">Buscar restaurantes</a><br>
+        <a class="btn btn-lg btn-primary" href = "{{url_for('busquedas')}}">Mis búsquedas</a>
+    </div>    
+        
+    </div>
+</header>
+{%endblock%}

@@ -1,0 +1,27 @@
+{%extends "layout.html" %}
+
+
+{%block cuerpo%}
+<header id="home" class="header" style="background-image: url('static/main.jpg')">
+    <div class="overlay text-white text-center">
+        <h2 class="display-4 mb-5">Identifícate</h2>
+        <h3 >{{mens}}</h3><br>
+        <div class="btn btn-lg ">
+                
+                <form action = "{{url_for('formulario')}}" method = "POST" >
+                    <input name = "nombre" type="text" id="booktable" class="form-control form-control-lg custom-form-control" placeholder="NOMBRE">
+                    <input name = "apellidos" type="text" id="booktable" class="form-control form-control-lg custom-form-control" placeholder="APELLIDOS"><br>
+                    <label for = "genero" class="form-control form-control-lg custom-form-control" >GÉNERO</label>
+                    <select name = "genero" class="form-control form-control-lg custom-form-control" >
+                        <option value = "Mujer" class="form-control form-control-lg custom-form-control" >Mujer</option>
+                        <option value = "Hombre" class="form-control form-control-lg custom-form-control" >Hombre</option>
+                        <option value = "Otro" class="form-control form-control-lg custom-form-control" >Otro</option>
+                    </select><br>
+                    <input type="submit" value="Continuar" class="btn btn-lg btn-primary" >
+                </form>
+                
+            
+        </div>
+    </div>         
+</header>
+{%endblock%}
