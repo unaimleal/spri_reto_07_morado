@@ -221,6 +221,7 @@ df.loc[df['Numero empleados']<=0, 'Numero empleados']=1
 df=df.applymap(lambda x: 99999 if x== np.inf else x)
 df=df.applymap(lambda x: -99999 if x== -np.inf else x)
 
+df_missings = df_missings.drop(['Codigo_NIF', 'year', 'Nombre_sabi'], axis=1)
 
 # CREACION DE LOS 2 DFS FINALES PARA LOS MODELOS
 

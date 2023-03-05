@@ -78,6 +78,11 @@
     <!-- Navbar End -->
 <content>
     {%block cuerpo%}
+        <div class="overlay text-white text-center">
+            <h1 class="display-2 font-weight-bold my-3">Hola</h1>
+            <h2 class="display-4 mb-5">Accede a nuestra página web</h2>
+            <a class="btn btn-lg btn-primary" href= "{{url_for('formulario')}}" >Empezar</a>
+        </div>
     {%endblock%}
 </content>
      <!-- Footer Start -->
@@ -85,36 +90,25 @@
      <div class="container-fluid bg-secondary text-white mt-5 py-5 px-sm-3 px-md-5">
         <div class="row pt-5">
             <div class="col-lg-4 col-md-12 mb-5">
-                <h1 class="mb-3 display-5 text-capitalize font-italic text-white"><span class="text-primary">Safety</span>First</h1>
-                <p class="m-0">Ipsum amet sed vero et lorem stet eos ut, labore sed sed stet sea est ipsum ut. Volup amet ea sanct ipsum, dolore vero lorem no duo eirmod. Eirmod amet ipsum no ipsum lorem clita ut. Ut sed sit lorem ea lorem sed, amet stet sit sea ea diam tempor kasd kasd. Diam nonumy etsit tempor ut sed diam sed et ea</p>
+                <h1 class="mb-3 display-5 text-capitalize font-italic text-white"><span class="text-primary">Grupo</span>Spri</h1>
+                <p class="m-0">El grupo “spri” es la entidad del Departamento de Desarrollo Económico, Sostenibilidad y Medio Ambiente del Gobierno Vasco. Esta entidad trabaja junto a empresas para facilitar el acceso a la digitalización, ciberseguridad e iniciarlas. Buscan una forma de expandir el negocio de sus clientes a otros países o a buscar espacios físicos, pabellones u oficinas, en los que instalarles.</p>
             </div>
             <div class="col-lg-8 col-md-12">
                 <div class="row">
                     <div class="col-md-4 mb-5">
-                        <h5 class="text-primary mb-4">Quick Links</h5>
+                        <h5 class="text-primary mb-4">Links Populares</h5>
                         <div class="d-flex flex-column justify-content-start">
-                            <a class="text-white mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Home</a>
-                            <a class="text-white mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>About Us</a>
-                            <a class="text-white mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Our Services</a>
-                            <a class="text-white mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Our Team</a>
-                            <a class="text-white" href="#"><i class="fa fa-angle-right mr-2"></i>Contact Us</a>
+                            <a class="text-white mb-2" href="https://www.spri.eus/es/"><i class="fa fa-angle-right mr-2"></i>Home</a>
+                            <a class="text-white mb-2" href="https://www.spri.eus/es/quienes-somos/"><i class="fa fa-angle-right mr-2"></i>Somos</a>
+                            <a class="text-white mb-2" href="https://www.google.es/maps/place/SPRI.+Agencia+vasca+de+desarrollo+empresarial/@43.2606151,-2.9390933,17z/data=!3m1!4b1!4m6!3m5!1s0xd4e4fd7d1270489:0x72b3c7d27757d1b3!8m2!3d43.2606151!4d-2.9369046!16s%2Fg%2F1tl8m04n?hl=es"><i class="fa fa-angle-right mr-2"></i>Donde estamos</a>
+                            <a class="text-white" href="https://www.spri.eus/es/servicio-de-atencion-al-cliente/"><i class="fa fa-angle-right mr-2"></i>Contacto</a>
                         </div>
                     </div>
                     <div class="col-md-4 mb-5">
-                        <h5 class="text-primary mb-4">Popular Links</h5>
-                        <div class="d-flex flex-column justify-content-start">
-                            <a class="text-white mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Home</a>
-                            <a class="text-white mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>About Us</a>
-                            <a class="text-white mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Our Services</a>
-                            <a class="text-white mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Our Team</a>
-                            <a class="text-white" href="#"><i class="fa fa-angle-right mr-2"></i>Contact Us</a>
-                        </div>
-                    </div>
-                    <div class="col-md-4 mb-5">
-                        <h5 class="text-primary mb-4">Get In Touch</h5>
-                        <p><i class="fa fa-map-marker-alt mr-2"></i>123 Street, New York, USA</p>
-                        <p><i class="fa fa-phone-alt mr-2"></i>+012 345 67890</p>
-                        <p><i class="fa fa-envelope mr-2"></i>info@example.com</p>
+                        <h5 class="text-primary mb-4">Contactanos</h5>
+                        <p><i class="fa fa-map-marker-alt mr-2"></i>Edificio Plaza Bizkaia Alameda Urquijo, 36 - 4ª Planta, 48011 Bilbao, Bizkaia</p>
+                        <p><i class="fa fa-phone-alt mr-2"></i>944 03 70 00</p>
+                        <p><i class="fa fa-envelope mr-2"></i>info@spri.eus</p>
                         <div class="d-flex justify-content-start mt-4">
                             <a class="btn btn-outline-light rounded-circle text-center mr-2 px-0" style="width: 40px; height: 40px;" href="#"><i class="fab fa-twitter"></i></a>
                             <a class="btn btn-outline-light rounded-circle text-center mr-2 px-0" style="width: 40px; height: 40px;" href="#"><i class="fab fa-facebook-f"></i></a>
@@ -135,17 +129,10 @@
             <div class="col-md-6 text-center text-md-right">
                 <ul class="nav d-inline-flex">
                     <li class="nav-item">
-                        <a class="nav-link text-white py-0" href="#">Privacy</a>
-                    </li>
+                        <a class="nav-link text-white py-0" href="https://agenda.spri.eus/es/">Agenda</a>
+
                     <li class="nav-item">
-                        <a class="nav-link text-white py-0" href="#">Terms</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white py-0" href="#">FAQs</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white py-0" href="#">Help</a>
-                    </li>
+                        <a class="nav-link text-white py-0" href="https://www.spri.eus/es/faq/">FAQs</a>
                 </ul>
             </div>
         </div>
