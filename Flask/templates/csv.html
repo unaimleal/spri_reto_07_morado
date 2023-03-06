@@ -1,6 +1,6 @@
 {%extends "layout.html"%}
 {%block cuerpo%}
-<form method="POST" enctype="multipart/form-data" action = '{{url_for("upload_file")}}'> <!--url_for y el nombre de la funcion-->
+<form method="POST" enctype="multipart/form-data" action = '{{url_for("importarcsv")}}'> <!--url_for y el nombre de la funcion-->
     <input type="file" name="file">
     <input type="submit" value="Upload">
 </form>

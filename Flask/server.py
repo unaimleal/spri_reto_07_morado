@@ -38,5 +38,9 @@ def formulario():
 def importarcsv():
     return render_template('csv.html')
 
+@app.route('/selccionmodelo', methods=['GET','POST'])
+def seleccionmodelo():
+    return render_template('seleccionmodelo.html')
+
 if __name__ == "__main__":
     app.run(debug = True)
