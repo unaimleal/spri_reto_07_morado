@@ -1,5 +1,5 @@
 from flask import Flask,  render_template, request, session
-
+import bbdd.sqlite as sql
 
 app = Flask(__name__)
 
@@ -9,30 +9,36 @@ app.secret_key = 'jshugk'
 def home():
     return render_template('layout.html')
 
-@app.route('/form', methods = ['POST', 'GET']) 
-def formulario():
-    if request.method == 'POST':
-        nombre = request.form['nombre']
-        apellidos = request.form['apellidos'] 
-        session['nombre'] = nombre
-        session['apellidos'] = apellidos
-        if (len(session['nombre']) == 0) & (len(session['apellidos']) == 0):
-            mens = 'Por favor, introduzca su nombre y apellidos.'
-            return render_template("form.html", mens = mens)    
-        
-        genero = request.form['genero']
-        if genero == 'Mujer':
-            ending = 'a'
-        elif genero == 'Hombre':
-            ending = 'o'
-        else:
-            ending = 'x'
-        mens = f'Bienvenid{ending}, {nombre} {apellidos}.'
+@app.route('/inicio', methods=['GET','POST'])
+def iniciosesion():
+    if request.method=='POST':
+        usuario=request.form.get('usuario')
+        contraseña=request.form.get('contraseña')
+        if not sql.nombre_existe(usuario):
+            return render_template('registrarse.html')
+        if not sql.comprobar_contraseña(usuario,contraseña):
+            mensaje=' El usuario o la contraseña no son correctos. Intentelo de nuevo'
+            return render_template('inicio.html', mensaje=mensaje)
+        return render_template('home.html', usuario=usuario) 
+    return render_template('inicio.html')
 
-        return render_template("home.html", 
-                             mens = mens)
-    else:
-        return render_template("form.html")
+@app.route('/registro',methods=['GET','POST'])
+def registro(): 
+    if request.method== 'POST':
+        usuario = request.form.get("usuario")
+        nombre = request.form.get('nombre')
+        apellido = request.form.get('apellido')
+        correo = request.form.get('correo')
+        contraseña = request.form.get("contraseña")
+        session['nombre']=nombre
+        if sql.nombre_existe(usuario):
+            mensaje='Ya hay un usuario con ese nombre. Intentelo con otro'
+            return render_template('registro.html', mensaje=mensaje) 
+        sql.insert_usuarios(nombre,apellido,correo,usuario,contraseña)
+        return render_template('home.html', nombre=nombre)
+
+    return render_template('registrarse.html')
+
 
 @app.route('/importarcsv', methods=['GET','POST'])
 def importarcsv():
@@ -41,6 +47,12 @@ def importarcsv():
 @app.route('/selccionmodelo', methods=['GET','POST'])
 def seleccionmodelo():
     return render_template('seleccionmodelo.html')
+
+############# Para ver los usuatios y contraseñas #antes de entragar borrar!!!!!!!
+@app.route('/consultar')
+def consultar():
+    registro=sql.consultar_usu()
+    return render_template('contraseñayusuario.html', registro=registro)
 
 if __name__ == "__main__":
     app.run(debug = True)

@@ -1,0 +1,25 @@
+{%extends "layout.html" %}
+
+
+{%block cuerpo%}
+<header id="home" class="header" style="background-image: url('static/main.jpg')">
+    <div class="overlay text-white text-center">
+        <h2 class="display-4 mb-5">Regístrate</h2><br>
+        <div class="btn btn-lg ">
+                
+                <form action = "{{url_for('registro')}}" method = "POST" >
+                    
+                    <h3 >{{mensaje}}</h3><br>
+                    <input name = "nombre" type="text" id="booktable" class="form-control form-control-lg custom-form-control" placeholder="Nombre">
+                    <input type="text" name="apellido"  placeholder="Apellido" class="form-control form-control-lg custom-form-control">
+                    <input type="email" name="correo"  placeholder="Correo electronico" class="form-control form-control-lg custom-form-control">
+                    <input type="text" name="usuario"  placeholder="Nombre de usuario" class="form-control form-control-lg custom-form-control">
+                    <input type="password" name="contraseña"  placeholder="Contraseña" class="form-control form-control-lg custom-form-control"><br>
+                    <input type="submit" value="Continuar" class="btn btn-lg btn-primary" >
+                </form>
+                
+            
+        </div>
+    </div>         
+</header>
+{%endblock%}
