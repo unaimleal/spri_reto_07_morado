@@ -1,7 +1,9 @@
-from flask import Flask,  render_template, request, session
+from flask import Flask,  render_template, request, session,redirect,url_for
 import bbdd.sqlite as sql
 
 app = Flask(__name__)
+
+sql.crear_tabla()
 
 app.secret_key = 'jshugk'
 
@@ -14,13 +16,19 @@ def iniciosesion():
     if request.method=='POST':
         usuario=request.form.get('usuario')
         contraseña=request.form.get('contraseña')
+        session['usuario']=usuario
         if not sql.nombre_existe(usuario):
             return render_template('registrarse.html')
         if not sql.comprobar_contraseña(usuario,contraseña):
             mensaje=' El usuario o la contraseña no son correctos. Intentelo de nuevo'
             return render_template('inicio.html', mensaje=mensaje)
-        return render_template('home.html', usuario=usuario) 
-    return render_template('inicio.html')
+        return redirect(url_for("principal")) 
+    return render_template ('inicio.html')
+
+@app.route('/paginaprincipal')
+def principal():
+    return render_template('home.html',usuario=session['usuario'])
+   
 
 @app.route('/registro',methods=['GET','POST'])
 def registro(): 
@@ -40,13 +48,24 @@ def registro():
     return render_template('registrarse.html')
 
 
-@app.route('/importarcsv', methods=['GET','POST'])
-def importarcsv():
+@app.route('/modelvalidacion', methods=['GET','POST'])
+def explvalidacion():
     return render_template('csv.html')
 
-@app.route('/selccionmodelo', methods=['GET','POST'])
-def seleccionmodelo():
+@app.route('/modeladquisicion', methods=['GET','POST'])
+def expladquisicion():
     return render_template('seleccionmodelo.html')
+
+@app.route('/visualizarmodelos', methods=['GET','POST'])
+def selecvisualizar():
+    if request.method=='POST':
+        visualizamodelo=request.form.get('visualizamodelo')
+        if visualizamodelo=='adquisicion':
+            return render_template('resultadosadquisicion.html')
+        if visualizamodelo=='validacion':
+            return render_template('resultadosvalidacion.html')
+        return render_template('home.html')
+    return render_template('selecvisualizar.html')
 
 ############# Para ver los usuatios y contraseñas #antes de entragar borrar!!!!!!!
 @app.route('/consultar')

@@ -55,18 +55,9 @@
                     <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
                         <div class="navbar-nav mr-auto py-0">
                             <a href="index.html" class="nav-item nav-link active">Home</a>
-                            <a href="{{url_for('importarcsv')}}" class="nav-item nav-link">Crear las predicciones</a>
-                            <a href="{{url_for('seleccionmodelo')}}" class="nav-item nav-link">Selecciona los modelos guardados</a>
-                            <a href="team.html" class="nav-item nav-link">Attorneys</a>
-                            <div class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Dropdown</a>
-                                <div class="dropdown-menu rounded-0 m-0">
-                                    <a href="#" class="dropdown-item">Menu Item 1</a>
-                                    <a href="#" class="dropdown-item">Menu Item 2</a>
-                                    <a href="#" class="dropdown-item">Menu Item 3</a>
-                                </div>
-                            </div>
-                            <a href="contact.html" class="nav-item nav-link">Contact</a>
+                            <a href="{{url_for('explvalidacion')}}" class="nav-item nav-link">Modelo de validación</a>
+                            <a href="{{url_for('expladquisicion')}}" class="nav-item nav-link">Modelo de adquisición</a>
+                            <a href="{{url_for('selecvisualizar')}}" class="nav-item nav-link">Visualizar los resultados</a>
                         </div>
                         <a href="" class="btn btn-primary mr-3 d-none d-lg-block">Get A Quote</a>
                     </div>
@@ -78,11 +69,7 @@
     <!-- Navbar End -->
 <content>
     {%block cuerpo%}
-        <div class="overlay text-white text-center">
-            <h1 class="display-2 font-weight-bold my-3">Hola</h1>
-            <h2 class="display-4 mb-5">Accede a nuestra página web</h2>
-            <a class="btn btn-lg btn-primary" href= "{{url_for('formulario')}}" >Empezar</a>
-        </div>
+    
     {%endblock%}
 </content>
      <!-- Footer Start -->
