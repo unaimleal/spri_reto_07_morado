@@ -91,6 +91,7 @@ df.loc[df['total_funding']==0, 'last_funding']=0
 df['Anos en Mercado']= (2023-df['Fecha constitucion'].dt.year)
 df['Anos desde ultima finanziacion']= (2023-df['last_funding_date'].dt.year).fillna(0).astype(int)
 df['ratio_last_funding']=df['last_funding']/df['total_funding']
+df['startup']= df['Anos en Mercado'].apply(lambda x: 1 if x<7 else 0)
 
 # se crea una variable dummy para saber si la empresa es una sociedad anonima o no
 df['Sociedad_anonima']= df['Forma juridica'].apply(lambda x: 1 if 'Sociedad anonima' in x else 0)
@@ -132,9 +133,9 @@ localidad= df['Localidad']
 
 # ELIMINACION DE COLUMNAS
 # se eliminan las columnas que no se van a utilizar 
-lista_columnas= ['name_dealroom', 'b2b_b2c', 'Fecha constitucion', 'last_funding_date', 'Localidad', 'Codigo consolidacion', 'Estado',
+lista_columnas= ['name_dealroom', 'Fecha constitucion', 'last_funding_date', 'Localidad', 'Codigo consolidacion', 'Estado',
  'tagline', 'website', 'profile_url', 'n_empleados_dealroom', 'Forma juridica detallada', 'Estado detallado', 'n_missings', 'Forma juridica',
- 'company_status', 'revenue_models', 'first_funding_date', 'Fecha constitucion', 'Resultado Actividades Ordinarias mil EUR', 
+ 'company_status',  'first_funding_date', 'Fecha constitucion', 'Resultado Actividades Ordinarias mil EUR', 
 'Inmovilizado material mil EUR', 'Inmovilizado inmaterial mil EUR', 'Existencias mil EUR', 'Rotacion de las existencias %', 
 'Inmovilizado material mil EUR', 'Gastos financieros y gastos asimilados mil EUR', 'Free capital mil EUR', 'Otros fondos propios mil EUR'  ]
 
@@ -175,7 +176,7 @@ for nif in df['Codigo_NIF'].unique():
 variables_eliminar= ['ratio_last_funding','last_round', 'last_funding', 'ownerships', 'Tesoreria mil EUR' ]
 df= df.drop(variables_eliminar, axis=1)
 df_missings= df_missings.drop(variables_eliminar, axis=1)
-
+ 
 df.loc[df['growth_stage'].isna(), 'growth_stage']= 0 # se asigna el valor más común
 df.loc[df['Deudores mil EUR'].isna(), 'Deudores mil EUR']= 0 # se considera que no hay deudores
 
@@ -185,7 +186,8 @@ df['Codigo primario CNAE adaptado']= df['Codigo primario CNAE 2009'].apply(lambd
 col = ['Coste medio de los empleados mil', 'Costes de los trabajadores / Ingresos de explotacion (%) %', 'Deudas financieras mil EUR', 'Acreedores a L. P. mil EUR',
        'Acreedores comerciales mil EUR', 'Periodo de cobro (dias) dias', 'Margen de beneficio (%) %']
 
-df = df[col].apply(lambda x: funciones_limpieza.imputacion_groupby(df, x.name))
+for columna in col:
+    df[columna] = df[columna].fillna(df.groupby('Codigo primario CNAE adaptado')[columna].transform('median'))
 
 
 df= df.drop('Codigo primario CNAE adaptado', axis=1)
@@ -225,10 +227,23 @@ df=df.applymap(lambda x: 99999 if x== np.inf else x)
 df=df.applymap(lambda x: -99999 if x== -np.inf else x)
 
 # creacion de variables
+df['Beneficio neto mil EUR']= df['Ingresos de explotacion mil EUR']-df['Gastos de personal mil EUR']
 df['ROA']= df['Beneficio neto mil EUR']/df['Total activo mil EUR']
 df['Margen_EBITDA']= df['EBITDA mil EUR']/df['Ingresos de explotacion mil EUR']
 
-df_missings = df_missings.drop(['year', 'Nombre_sabi'], axis=1)
+df_missings = df_missings.drop(['Nombre_sabi'], axis=1)
+
+# se guardan variables para meter a los df de modelos cogiendo 1 de cada 2 filas porque cada empresa tiene 2 filas
+startup= df['startup'].iloc[::2]
+growth_stage= df['growth_stage'].iloc[::2]
+revenue_models= df['revenue_models'].iloc[::2]
+b2b_b2c= df['b2b_b2c'].iloc[::2]
+nombre_sabi= df['Nombre_sabi'].iloc[::2]
+valoracion= df['valuation_2022'].iloc[::2]
+variables = pd.concat([startup, growth_stage, revenue_models,b2b_b2c,nombre_sabi  ], axis=1)
+variables_valoracion = pd.concat([startup, growth_stage, revenue_models,b2b_b2c, nombre_sabi, valoracion ], axis=1)
+variables_valoracion= variables_valoracion.dropna(subset=['valuation_2022'])
+print(variables_valoracion.columns)
 
 # CREACION DE LOS 2 DFS FINALES PARA LOS MODELOS
 
@@ -240,16 +255,14 @@ df_adquisicion_missings, df_valoracion_missings =funciones_limpieza.creacion_dfs
 df_graficos= df_adquisicion.copy()
 df_graficos['Localidad']= localidad
 
-columnas_valoracion_nif_nombre= df_valoracion['Codigo_NIF','Nombre_sabi']
-columnas_adquisicion_nif_nombre= df_adquisicion['Codigo_NIF','Nombre_sabi']
 
 # SELECCION DE VARIABLES PARA LOS MODELOS
 df_adquisicion = funciones_limpieza.seleccion_de_variables(df_adquisicion, 'Porcentaje_adquisicion_cat', variables_con_missings_antes_nif)
 df_valoracion = funciones_limpieza.seleccion_de_variables(df_valoracion, 'valuation_2022', variables_con_missings_antes_nif)
 
 # se añaden las columnas de nif y nombre
-df_adquisicion = pd.concat([columnas_adquisicion_nif_nombre, df_adquisicion], axis=1)
-df_valoracion = pd.concat([columnas_valoracion_nif_nombre, df_valoracion], axis=1)
+df_adquisicion = pd.concat([variables, df_adquisicion], axis=1)
+df_valoracion = pd.concat([variables_valoracion, df_valoracion], axis=1)
 
 # CREACION DE CSVS
 # se crea la carpeta de datos limpios
