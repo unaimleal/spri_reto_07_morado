@@ -131,7 +131,7 @@ def creacion_dfs_finales(df, columnas_financieras_completas ):
     # Se RalizaN estos calculos si alguna de estas columnas es nula, y se sustituye el valor nulo por el calculado
     df_valoracion.loc[:,'Precio/Venta']=(df_valoracion['valuation_2022']/df_valoracion['Importe neto Cifra de Ventas mil EUR_2021'])
     df_valoracion.loc[:,'Precio/Ebitda']=(df_valoracion['valuation_2022']/df_valoracion['EBITDA mil EUR_2021'])
-    df_valoracion.loc[:,'Precio/Ebit']=(df_valoracion['valuation_2022']/df_valoracion['EBIT mil EUR_2021'])
+    df_valoracion.loc[:,'PER']=(df_valoracion['valuation_2022']/df_valoracion['EBIT mil EUR_2021'])
 
     # Se reemplazan valores infinitos con valores altos.
     df_valoracion.loc[:,'Precio/Venta']=df_valoracion['Precio/Venta'].replace([np.inf, -np.inf], [99999, -99999])

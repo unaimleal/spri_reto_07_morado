@@ -135,8 +135,8 @@ localidad= df['Localidad']
 lista_columnas= ['name_dealroom', 'b2b_b2c', 'Fecha constitucion', 'last_funding_date', 'Localidad', 'Codigo consolidacion', 'Estado',
  'tagline', 'website', 'profile_url', 'n_empleados_dealroom', 'Forma juridica detallada', 'Estado detallado', 'n_missings', 'Forma juridica',
  'company_status', 'revenue_models', 'first_funding_date', 'Fecha constitucion', 'Resultado Actividades Ordinarias mil EUR', 
-'Inmovilizado material mil EUR', 'Inmovilizado inmaterial mil EUR', 'Existencias mil EUR', 'Rotacion de las existencias %', 'Inmovilizado material mil EUR',
-'Dotaciones para amortiz. de inmovil. mil EUR', 'Gastos financieros y gastos asimilados mil EUR', 'Free capital mil EUR', 'Otros fondos propios mil EUR'  ]
+'Inmovilizado material mil EUR', 'Inmovilizado inmaterial mil EUR', 'Existencias mil EUR', 'Rotacion de las existencias %', 
+'Inmovilizado material mil EUR', 'Gastos financieros y gastos asimilados mil EUR', 'Free capital mil EUR', 'Otros fondos propios mil EUR'  ]
 
 df= df.drop(lista_columnas, axis=1)
 
@@ -151,7 +151,7 @@ df_missings= df.copy()
 # se actualiza la lista de variables financieras
 variables_financieras_eliminadas= ['Resultado Actividades Ordinarias mil EUR', 'Inmovilizado material mil EUR',
  'Inmovilizado inmaterial mil EUR', 'Existencias mil EUR', 'Rotacion de las existencias %', 
- 'Dotaciones para amortiz. de inmovil. mil EUR', 'Gastos financieros y gastos asimilados mil EUR', 'Tesoreria mil EUR',
+ 'Gastos financieros y gastos asimilados mil EUR', 'Tesoreria mil EUR',
   'Otros fondos propios mil EUR']
 columnas_financieras_completas= columnas_financieras.drop(['year', 'Codigo_NIF', 'n_missings']).drop(variables_financieras_eliminadas)
 columnas_financieras_completas= columnas_financieras_completas.append(pd.Index(['Total pasivo']))
@@ -182,8 +182,9 @@ df['Codigo primario CNAE adaptado']= df['Codigo primario CNAE 2009'].apply(lambd
 
 col = ['Coste medio de los empleados mil', 'Costes de los trabajadores / Ingresos de explotacion (%) %', 'Deudas financieras mil EUR', 'Acreedores a L. P. mil EUR',
        'Acreedores comerciales mil EUR', 'Periodo de cobro (dias) dias', 'Margen de beneficio (%) %']
-for columna in col:
-    df= funciones_limpieza.imputacion_groupby(df, col)
+
+df = df[col].apply(lambda x: funciones_limpieza.imputacion_groupby(df, x.name))
+
 
 df= df.drop('Codigo primario CNAE adaptado', axis=1)
 
@@ -220,6 +221,10 @@ df.loc[df['Numero empleados']<=0, 'Numero empleados']=1
 
 df=df.applymap(lambda x: 99999 if x== np.inf else x)
 df=df.applymap(lambda x: -99999 if x== -np.inf else x)
+
+# creacion de variables
+df['ROA']= df['Beneficio neto mil EUR']/df['Total activo mil EUR']
+df['Margen_EBITDA']= df['EBITDA mil EUR']/df['Ingresos de explotacion mil EUR']
 
 df_missings = df_missings.drop(['Codigo_NIF', 'year', 'Nombre_sabi'], axis=1)
 
