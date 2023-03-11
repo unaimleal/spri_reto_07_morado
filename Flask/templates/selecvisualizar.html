@@ -1,16 +1,17 @@
 {%extends "layout2.html"%}
 {%block cuerpo%}
-<from action="{{url_for('selecvisualizar')}}" vmethod="POST" >
 <div class="container-fluid my-5 py-5 text-center">
         
-<label style="color:black">Seleccione el modelo del cual quiere visualizar los datos: </label><br>
-<select name="visualizamodelo" class="selectvisualizar">
-    <option value="None"></option>
-    <option value="adquisicion">Modelo de adquisición</option>
+<p style="color:black">Seleccione el modelo del cual quiere visualizar los datos: </p><br>
+<form action="{{url_for('selecvisualizar')}}" method="POST" >
+
+<select name="visualizamodelo" class="selectvisualizar2">
+    <option value="None"> </option>
+    <option value="ad">Modelo de adquisición</option>
     <option value="validacion">Modelo de validación</option>
 </select><br>
 <br>
-<input class="btn btn-secondary" type="submit" value="Visualizar resultados">
+<input type="submit" class="btn btn-secondary" value="Visualizar resultados">
 </div>
-</from>
+</form>
 {%endblock%}

@@ -47,25 +47,45 @@ def registro():
 
     return render_template('registrarse.html')
 
-
+###########################
 @app.route('/modelvalidacion', methods=['GET','POST'])
 def explvalidacion():
-    return render_template('csv.html')
+    if request.method=='POST':
+        return redirect(url_for('seleccionmetodoval'))
+    return render_template('explicacionad.html')
 
-@app.route('/modeladquisicion', methods=['GET','POST'])
+@app.route('/seleccionval', methods=['GET','POST'])
+def seleccionmetodoval():
+    if request.method=='POST':
+        metodo=request.form.get('metodo')
+        if metodo=='empresa':
+            return render_template('empresval.html')
+        return render_template('manualval.html')
+    return render_template('selccionmetodoval.html')
+###########################
+@app.route('/modeladquisicion', methods=['GET'])
 def expladquisicion():
-    return render_template('seleccionmodelo.html')
+    return render_template('explicacionval.html')
 
+@app.route('/seleccionad', methods=['GET','POST'])
+def seleccionmetodoad():
+    if request.method=='POST':
+        metodo=request.form.get('metodo')
+        if metodo=='csv':
+            return render_template('empresad.html')
+        return render_template('manualad.html')
+    return render_template('selccionmetodoad.html')
+############################
 @app.route('/visualizarmodelos', methods=['GET','POST'])
 def selecvisualizar():
     if request.method=='POST':
-        visualizamodelo=request.form.get('visualizamodelo')
-        if visualizamodelo=='adquisicion':
+        visualizamodelo = request.form.get('visualizamodelo')
+        if visualizamodelo == 'ad':
             return render_template('resultadosadquisicion.html')
-        if visualizamodelo=='validacion':
-            return render_template('resultadosvalidacion.html')
-        return render_template('home.html')
+        return render_template('resultadosvalidacion.html')
     return render_template('selecvisualizar.html')
+
+
 
 ############# Para ver los usuatios y contraseñas #antes de entragar borrar!!!!!!!
 @app.route('/consultar')
