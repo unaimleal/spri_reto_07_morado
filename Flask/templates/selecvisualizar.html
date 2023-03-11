@@ -1,0 +1,17 @@
+{%extends "layout2.html"%}
+{%block cuerpo%}
+<div class="container-fluid my-5 py-5 text-center">
+        
+<p style="color:black">Seleccione el modelo del cual quiere visualizar los datos: </p><br>
+<form action="{{url_for('selecvisualizar')}}" method="POST" >
+
+<select name="visualizamodelo" class="selectvisualizar2">
+    <option value="None"> </option>
+    <option value="ad">Modelo de adquisición</option>
+    <option value="validacion">Modelo de validación</option>
+</select><br>
+<br>
+<input type="submit" class="btn btn-secondary" value="Visualizar resultados">
+</div>
+</form>
+{%endblock%}

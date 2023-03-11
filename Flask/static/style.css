@@ -580,6 +580,7 @@ pre code {
   padding-left: 15px;
   margin-right: auto;
   margin-left: auto;
+  justify-content: space-between;
 }
 
 @media (min-width: 576px) {
@@ -3280,7 +3281,9 @@ input[type=button].btn-block {
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
-  width: 100%;
+  width: auto;
+  justify-content: center;
+  
 }
 .input-group > .form-control,
 .input-group > .form-control-plaintext,
@@ -9839,3 +9842,13 @@ h6 {
 }
 
 /*# sourceMappingURL=style.css.map */
+
+.selctvisualizar2 {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  width: auto;
+  justify-content: center;
+  
+}

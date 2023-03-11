@@ -34,7 +34,7 @@ def insert_usuarios(nombre:str,apellido:str,correo:str,usuario:str,contraseña:s
 def nombre_existe(usuario:str):
     con = sqlite.connect(bbdd)
     cur = con.cursor()
-    cur.execute("SELECT nombre FROM usuarios WHERE nombre = ?", (usuario,)) 
+    cur.execute("SELECT usuario FROM usuarios WHERE usuario = ?", (usuario,)) 
     email_res = cur.fetchone()
     con.close()
     return email_res is not None
@@ -47,3 +47,12 @@ def comprobar_contraseña(usuario:str,contraseña:str):
     contra=cur.fetchone()[0]
     con.close()
     return contraseña == contra
+######## antes de entregar borrar!!!!!!!!!!!!!!
+def consultar_usu():
+    con = sqlite.connect(bbdd) 
+    cur = con.cursor() 
+    cur.execute("SELECT * FROM usuarios")
+    usu= cur.fetchall()
+    con.close()  
+
+    return usu
