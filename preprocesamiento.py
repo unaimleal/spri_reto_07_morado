@@ -161,6 +161,8 @@ print(df.isna().sum()[df.isna().sum()>0].sort_values(ascending=False).count())
 variables_con_missings= df.isna().sum()[df.isna().sum()>0].sort_values(ascending=False)
 variables_con_missings_columnas= list(variables_con_missings.index)
 
+variables_con_missings_antes_nif= df.isna().sum()[df.isna().sum()>0].sort_values(ascending=False)
+
 # se crea un for para que si una empresa tiene un missing en una columna financiera en un año, se sustituye por el del año anterior o posterior
 for nif in df['Codigo_NIF'].unique():
     for columna in variables_con_missings_columnas:
@@ -226,7 +228,7 @@ df=df.applymap(lambda x: -99999 if x== -np.inf else x)
 df['ROA']= df['Beneficio neto mil EUR']/df['Total activo mil EUR']
 df['Margen_EBITDA']= df['EBITDA mil EUR']/df['Ingresos de explotacion mil EUR']
 
-df_missings = df_missings.drop(['Codigo_NIF', 'year', 'Nombre_sabi'], axis=1)
+df_missings = df_missings.drop(['year', 'Nombre_sabi'], axis=1)
 
 # CREACION DE LOS 2 DFS FINALES PARA LOS MODELOS
 
@@ -238,6 +240,16 @@ df_adquisicion_missings, df_valoracion_missings =funciones_limpieza.creacion_dfs
 df_graficos= df_adquisicion.copy()
 df_graficos['Localidad']= localidad
 
+columnas_valoracion_nif_nombre= df_valoracion['Codigo_NIF','Nombre_sabi']
+columnas_adquisicion_nif_nombre= df_adquisicion['Codigo_NIF','Nombre_sabi']
+
+# SELECCION DE VARIABLES PARA LOS MODELOS
+df_adquisicion = funciones_limpieza.seleccion_de_variables(df_adquisicion, 'Porcentaje_adquisicion_cat', variables_con_missings_antes_nif)
+df_valoracion = funciones_limpieza.seleccion_de_variables(df_valoracion, 'valuation_2022', variables_con_missings_antes_nif)
+
+# se añaden las columnas de nif y nombre
+df_adquisicion = pd.concat([columnas_adquisicion_nif_nombre, df_adquisicion], axis=1)
+df_valoracion = pd.concat([columnas_valoracion_nif_nombre, df_valoracion], axis=1)
 
 # CREACION DE CSVS
 # se crea la carpeta de datos limpios

@@ -1,7 +1,7 @@
 from sklearn.linear_model import LinearRegression
 import pandas as pd
 import numpy as np
-import os
+from sklearn.ensemble import RandomForestRegressor
 
 def codificar_tildes(df):
     """
@@ -137,4 +137,48 @@ def creacion_dfs_finales(df, columnas_financieras_completas ):
     df_valoracion.loc[:,'Precio/Venta']=df_valoracion['Precio/Venta'].replace([np.inf, -np.inf], [99999, -99999])
 
     return df_adquisicion_final, df_valoracion
+
+
+def seleccion_de_variables(df, variable_objetivo, variables_con_missings_antes_nif):
+    correlacion = df.corr()[variable_objetivo]
+
+    # solo se cogen los que tengan una correlacion mas alta que 0.3
+    df_correlacion_valor_absoluto = pd.DataFrame({'Variables': correlacion.index, 'Correlacion con valuation_2022': correlacion.abs().values}).sort_values(by='Correlacion con valuation_2022', ascending=False)
+    
+    # si la variable objetivo es valuation_2022 se cogen correlaciones mayores que 0.3 y sino mayores que 0.1
+    if variable_objetivo=='valuation_2022':
+        columnas_a_mantener= list(df_correlacion_valor_absoluto[df_correlacion_valor_absoluto[f'Correlacion con {variable_objetivo}']>0.3]['Variables'].values)
+    else:
+        columnas_a_mantener= list(df_correlacion_valor_absoluto[df_correlacion_valor_absoluto[f'Correlacion con {variable_objetivo}']>0.1]['Variables'].values)
+    df_seleccionado=df[columnas_a_mantener]
+
+    # se hace un modelo random forest para ver que variables son las mas importantes
+    x = df_seleccionado.iloc[:,1:]
+    y= df_seleccionado[variable_objetivo]
+
+    rf = RandomForestRegressor(random_state=0)
+    rf.fit(x, y)
+
+    forest_importances = pd.Series(rf.feature_importances_, index=df_seleccionado.drop('valuation_2022', axis=1).columns).sort_values(ascending=True)
+    #Crear dataframe con importancia de caracteristicas forest_importances=forest_importances.to_frame().reset_index()
+    forest_importances=forest_importances.to_frame().reset_index()
+    forest_importances.columns=['feature', 'importance']
+
+    #cambio las terminaciones de las columnas, quitando _2021 y _ratio para tener en cuenta cuales fueron imputadas previamente 
+    forest_importances['feature'] = forest_importances['feature'].str.replace('_2021', '')
+    forest_importances['feature'] = forest_importances['feature'].str.replace('_ratio', '')
+
+    variables_con_missings_antes_nif = variables_con_missings_antes_nif.to_frame().reset_index()
+
+    variables_con_missings_antes_nif.columns=['feature', 'index']
+    #merge forest_importances con variables_con_missings_antes_nif por la columna feature
+    variables_con_missings_antes_nif= variables_con_missings_antes_nif.merge(forest_importances, on='feature', how='right')
+    variables_con_missings_antes_nif['index']=variables_con_missings_antes_nif['index'].fillna(0)
+
+    #se eliminan las filas(en el df_valoracion_seleccionado columnas) con mas de 200 missings(index)
+    variables_con_missings_antes_nif= variables_con_missings_antes_nif[variables_con_missings_antes_nif['index']<80]
+    df_seleccionado_final= df_seleccionado[df_seleccionado.columns[df_seleccionado.columns.str.startswith(tuple(variables_con_missings_antes_nif['feature']))]]
+    df_seleccionado_final['valuation_2022']=df_seleccionado['valuation_2022']
+
+    return df_seleccionado_final
 
