@@ -53,7 +53,7 @@ def registro():
 def explvalidacion():
     if request.method=='POST':
         return redirect(url_for('seleccionmetodoval'))
-    return render_template('explicacionad.html')
+    return render_template('explicacionval.html')
 
 @app.route('/seleccionval', methods=['GET','POST'])
 def seleccionmetodoval():
@@ -62,7 +62,7 @@ def seleccionmetodoval():
         if metodo=='empresa':
             return render_template('empresval.html')
         return render_template('manualval.html')
-    return render_template('selccionmetodoval.html')
+    return render_template('seleccionmetodoval.html')
 ###########################
 @app.route('/modeladquisicion', methods=['GET'])
 def expladquisicion():
@@ -72,7 +72,7 @@ def expladquisicion():
 def seleccionmetodoad():
     if request.method=='POST':
         metodo=request.form.get('metodo')
-        if metodo=='csv':
+        if metodo=='empresa':
             return render_template('empresad.html')
         return render_template('manualad.html')
     return render_template('selccionmetodoad.html')
