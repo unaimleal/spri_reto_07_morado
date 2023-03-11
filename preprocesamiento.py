@@ -135,7 +135,7 @@ localidad= df['Localidad']
 # se eliminan las columnas que no se van a utilizar 
 lista_columnas= ['name_dealroom', 'Fecha constitucion', 'last_funding_date', 'Localidad', 'Codigo consolidacion', 'Estado',
  'tagline', 'website', 'profile_url', 'n_empleados_dealroom', 'Forma juridica detallada', 'Estado detallado', 'n_missings', 'Forma juridica',
- 'company_status',  'first_funding_date', 'Fecha constitucion', 'Resultado Actividades Ordinarias mil EUR', 
+ 'company_status',  'first_funding_date', 'Fecha constitucion', 'Resultado Actividades Ordinarias mil EUR', 'revenue_models',
 'Inmovilizado material mil EUR', 'Inmovilizado inmaterial mil EUR', 'Existencias mil EUR', 'Rotacion de las existencias %', 
 'Inmovilizado material mil EUR', 'Gastos financieros y gastos asimilados mil EUR', 'Free capital mil EUR', 'Otros fondos propios mil EUR'  ]
 
@@ -236,14 +236,16 @@ df_missings = df_missings.drop(['Nombre_sabi'], axis=1)
 # se guardan variables para meter a los df de modelos cogiendo 1 de cada 2 filas porque cada empresa tiene 2 filas
 startup= df['startup'].iloc[::2]
 growth_stage= df['growth_stage'].iloc[::2]
-revenue_models= df['revenue_models'].iloc[::2]
 b2b_b2c= df['b2b_b2c'].iloc[::2]
 nombre_sabi= df['Nombre_sabi'].iloc[::2]
 valoracion= df['valuation_2022'].iloc[::2]
-variables = pd.concat([startup, growth_stage, revenue_models,b2b_b2c,nombre_sabi  ], axis=1)
-variables_valoracion = pd.concat([startup, growth_stage, revenue_models,b2b_b2c, nombre_sabi, valoracion ], axis=1)
+variables = pd.concat([b2b_b2c,nombre_sabi  ], axis=1)
+variables_valoracion = pd.concat([startup, growth_stage,b2b_b2c, nombre_sabi, valoracion ], axis=1)
 variables_valoracion= variables_valoracion.dropna(subset=['valuation_2022'])
 print(variables_valoracion.columns)
+print(variables.shape)
+print(variables_valoracion.shape)
+print(variables['Nombre_sabi'].nunique())
 
 # CREACION DE LOS 2 DFS FINALES PARA LOS MODELOS
 
@@ -255,14 +257,16 @@ df_adquisicion_missings, df_valoracion_missings =funciones_limpieza.creacion_dfs
 df_graficos= df_adquisicion.copy()
 df_graficos['Localidad']= localidad
 
-
+print(df_valoracion.shape)
 # SELECCION DE VARIABLES PARA LOS MODELOS
 df_adquisicion = funciones_limpieza.seleccion_de_variables(df_adquisicion, 'Porcentaje_adquisicion_cat', variables_con_missings_antes_nif)
 df_valoracion = funciones_limpieza.seleccion_de_variables(df_valoracion, 'valuation_2022', variables_con_missings_antes_nif)
 
 # se añaden las columnas de nif y nombre
-df_adquisicion = pd.concat([variables, df_adquisicion], axis=1)
-df_valoracion = pd.concat([variables_valoracion, df_valoracion], axis=1)
+df_adquisicion['Nombre_sabi']= nombre_sabi.values
+
+df_adquisicion = pd.merge(variables, df_adquisicion, on= 'Nombre_sabi', how= 'inner')
+df_valoracion = pd.merge(variables_valoracion, df_valoracion, on= 'valuation_2022', how= 'right')
 
 # CREACION DE CSVS
 # se crea la carpeta de datos limpios
