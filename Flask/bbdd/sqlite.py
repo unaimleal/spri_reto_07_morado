@@ -56,3 +56,18 @@ def consultar_usu():
     con.close()  
 
     return usu
+
+###############
+def manual_adquisicion():
+    con = sqlite.connect(bbdd)
+    cur=con.cursor()
+    cur.execute("""CREATE TABLE IF NOT EXISTS prueba_manual_ad (
+        nombre TEXT NOT NULL,
+        apellido TEXT NOT NULL,
+        correo TEXT NOT NULL,
+        usuario TEXT PRAMARY KEY NOT NULL,
+        contraseña TEXT NOT NULL
+        )
+    """)
+    con.close()
+    return None

@@ -1,6 +1,7 @@
 from flask import Flask,  render_template, request, session,redirect,url_for
 import bbdd.sqlite as sql
 
+
 app = Flask(__name__)
 
 sql.crear_tabla()
