@@ -1,7 +1,12 @@
 {%extends "layout2.html"%}
 {%block cuerpo%}
 <h1>Modelo de adquisición</h1>
-<p>Explicar el modelo</p>
+<p>Mediante un modelo de clasificación se va a predecir si una empresa será:</p>
+<ul>
+    <li>Adquirida totalmente (100%)</li>
+    <li>Adquirida parcialmente</li>
+    <li>Seguirá su curso sin accionistas (no será adquirida)</li>
+  </ul>
 <form action="{{url_for('explvalidacion')}}" method="POST">
 <input type="submit" formaction="{{url_for('seleccionmetodoad')}}">
 </form>
