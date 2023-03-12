@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 import os
 import packages.Preprocesamiento.funciones_limpieza as funciones_limpieza
+import warnings
+warnings.filterwarnings('ignore')
 
 CARPETA_DATOS_ORIGINALES = 'Datos/Originales/'
 df_sabi_1= pd.read_excel(os.path.join(CARPETA_DATOS_ORIGINALES, 'df_sabi_modif_1.xlsx'))
@@ -242,10 +244,6 @@ valoracion= df['valuation_2022'].iloc[::2]
 variables = pd.concat([b2b_b2c,nombre_sabi  ], axis=1)
 variables_valoracion = pd.concat([startup, growth_stage,b2b_b2c, nombre_sabi, valoracion ], axis=1)
 variables_valoracion= variables_valoracion.dropna(subset=['valuation_2022'])
-print(variables_valoracion.columns)
-print(variables.shape)
-print(variables_valoracion.shape)
-print(variables['Nombre_sabi'].nunique())
 
 # CREACION DE LOS 2 DFS FINALES PARA LOS MODELOS
 
@@ -257,7 +255,6 @@ df_adquisicion_missings, df_valoracion_missings =funciones_limpieza.creacion_dfs
 df_graficos= df_adquisicion.copy()
 df_graficos['Localidad']= localidad
 
-print(df_valoracion.shape)
 # SELECCION DE VARIABLES PARA LOS MODELOS
 df_adquisicion = funciones_limpieza.seleccion_de_variables(df_adquisicion, 'Porcentaje_adquisicion_cat', variables_con_missings_antes_nif)
 df_valoracion = funciones_limpieza.seleccion_de_variables(df_valoracion, 'valuation_2022', variables_con_missings_antes_nif)
