@@ -1,6 +1,14 @@
 from flask import Flask,  render_template, request, session,redirect,url_for
 import bbdd.sqlite as sql
 import pandas as pd
+import pickle as pkl
+import os
+
+CARPETA_MODELOS1 = "../modelos/clasificacion"
+CARPETA_MODELOS2 = "../modelos/regresion"
+modelo_clasificacion = pkl.load(open(os.path.join(CARPETA_MODELOS1,"modelo_lineal.pkl"),"rb"))
+modelo_regresion = pkl.load(open(os.path.join(CARPETA_MODELOS2,"modelo_lineal.pkl"),"rb"))
+
 
 
 app = Flask(__name__)
