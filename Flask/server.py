@@ -5,6 +5,7 @@ import pickle as pkl
 import os
 from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBRegressor
+import numpy as np
 
 CARPETA_MODELOS1 = "../modelos/clasificacion"
 CARPETA_MODELOS2 = "../modelos/regresion"
@@ -25,6 +26,7 @@ columnas_adquisicion=['Anos en Mercado','Cash flow mil EUR_2021','EBITDA mil EUR
 
 df_valoracion = pd.read_csv('../Datos/Limpios/df_valoracion.csv')
 df_adquisicion = pd.read_csv('../Datos/Limpios/df_adquisicion.csv')
+print(np.mean(df_valoracion['valuation_2022']))
 
 sql.crear_tabla()
 
@@ -97,9 +99,11 @@ def manualval():
             datos_val[i]=datos
         df_datos_val.append(datos_val)
         df_datos_val=pd.DataFrame(df_datos_val)
+        df_datos_val=df_datos_val.apply(lambda x: x.astype('float64'))
         prediccion=modelo_regresion.predict(df_datos_val)
+        prediccion=prediccion[0]
         print(prediccion)
-        return 'datos enviados'
+        return f'La prediccion de su empresa es: {prediccion}'
     return render_template('manualval.html',columnas=columnas_valoracion)
 
 b2b_b2c = list(df_valoracion['b2b_b2c'].unique())
@@ -128,7 +132,10 @@ def empresaval():
 def resultempresaval():
     empresa=request.form.get('empresaval')
     df_empresa_val=df_valoracion[df_valoracion['Nombre_sabi']==empresa]
+    df_empresa_val=df_empresa_val.iloc[:,5:]
+    #prediccion=modelo_regresion.predict(df_empresa_val)
     print(df_empresa_val,empresa)
+    #print(prediccion)
     return 'modelo'
 
 ###########################
