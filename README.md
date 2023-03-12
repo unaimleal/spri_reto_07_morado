@@ -41,8 +41,8 @@ Para poder recibir una información previa sobre la estructuración del proyecto
 
 ###########
 
-***03-modelado_adquisicion.ipynb:*** Creación de nuevos variables.
+***03-modelado_adquisicion.ipynb:*** Modelado para la clasificación de la adquisición empresas.
 
-***03-modelado_valoracion.ipynb:*** Realización de Clustering de los datos.
+***03-modelado_valoracion.ipynb:*** Modelado para la regresión de la valoración de las empresas.
 
 
