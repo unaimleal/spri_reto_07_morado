@@ -241,9 +241,11 @@ growth_stage= df['growth_stage'].iloc[::2]
 b2b_b2c= df['b2b_b2c'].iloc[::2]
 nombre_sabi= df['Nombre_sabi'].iloc[::2]
 valoracion= df['valuation_2022'].iloc[::2]
+activo= df['Total activo mil EUR'].iloc[::2]
 variables = pd.concat([b2b_b2c,nombre_sabi  ], axis=1)
-variables_valoracion = pd.concat([startup, growth_stage,b2b_b2c, nombre_sabi, valoracion ], axis=1)
+variables_valoracion = pd.concat([startup, growth_stage,b2b_b2c, nombre_sabi, valoracion, activo ], axis=1)
 variables_valoracion= variables_valoracion.dropna(subset=['valuation_2022'])
+variables_valoracion= variables_valoracion.rename(columns={'Total activo mil EUR': 'Total activo mil EUR_2021'})
 
 # CREACION DE LOS 2 DFS FINALES PARA LOS MODELOS
 
@@ -263,7 +265,7 @@ df_valoracion = funciones_limpieza.seleccion_de_variables(df_valoracion, 'valuat
 df_adquisicion['Nombre_sabi']= nombre_sabi.values
 
 df_adquisicion = pd.merge(variables, df_adquisicion, on= 'Nombre_sabi', how= 'inner')
-df_valoracion = pd.merge(variables_valoracion, df_valoracion, on= 'valuation_2022', how= 'right')
+df_valoracion = pd.merge(variables_valoracion, df_valoracion, on= ['valuation_2022', 'Total activo mil EUR_2021'], how= 'right')
 
 # CREACION DE CSVS
 # se crea la carpeta de datos limpios
