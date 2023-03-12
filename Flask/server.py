@@ -75,7 +75,7 @@ def seleccionmetodoval():
             return redirect(url_for('empresaval'))
         return redirect(url_for('manualval'))
     return render_template('seleccionmetodoval.html')
-
+################################
 @app.route('/manualval', methods=['GET','POST'])
 def manualval():
     if request.method=='POST':
@@ -89,34 +89,34 @@ def manualval():
         print(df_datos_val)
         return 'datos enviados'
     return render_template('manualval.html',columnas=columnas_valoracion)
-
+################################
 b2b_b2c = list(df_valoracion['b2b_b2c'].unique())
 startup = list(df_valoracion['startup'].unique())
 
-@app.route("/empresaval")
+@app.route("/empresaval", methods=['GET','POST'])
 def empresaval():
+    if request.method=='POST':
+        b2=request.form.get('b2')
+        start=request.form.get('start')
+        select_start=int(start)
+        print(b2,type(select_start))
+        session['selected_b2'] = b2
+        session['selected_start'] = select_start
+        filtered_data = df_valoracion[(df_valoracion["b2b_b2c"] == b2) & (df_valoracion["startup"] == select_start) ]['Nombre_sabi']
+        linea=[]
+        for row in filtered_data.unique():
+            linea.append(row)
+        print(linea)
+        return render_template('resultempresaval.html', row_data=linea,b2b_b2c=b2,startup=start)
     return render_template('empresaval.html', 
                     b2b_b2c = b2b_b2c, 
                     startup = startup)
 
-@app.route('/resultempresaval', methods = ['POST', 'GET'])
+@app.route('/resultempresaval', methods = ['POST'])
 def resultempresaval():
-    if request.method == 'POST':
-        selected_b2 = request.form.get('b2')
-        selected_start = request.form.get('start')
-        session['selected_b2'] = selected_b2
-        session['selected_start'] = selected_start
-        filtered_data = df_valoracion[(df_valoracion["b2b_b2c"] == selected_b2) & (df_valoracion["startup"] == selected_start) ]['Nombre_sabi']
-        if len(filtered_data) > 0:
-            return render_template('resultempresaval.html', 
-                                            column_names = filtered_data.columns.values, 
-                                            row_data = list(filtered_data.values.tolist()), 
-                                            zip = zip)
-        else:
-            return render_template('empresasinresult.html')
-    else:
-        return render_template('empresaval.html', 
-                               b2b_b2c = b2b_b2c, startup = startup)
+    empresa=request.form.get('row')
+    print(empresa)
+    return 'modelo'
     
 ###########################
 @app.route('/modeladquisicion', methods=['GET','POST'])
@@ -131,7 +131,7 @@ def seleccionmetodoad():
         metodo=request.form.get('metodo')
         if metodo=='empresa':
             return render_template('empresad.html')
-        return render_template('manualad.html')
+        return redirect(url_for('manualad'))
     return render_template('seleccionmetodoad.html')
 
 @app.route('/manualad', methods=['GET','POST'])

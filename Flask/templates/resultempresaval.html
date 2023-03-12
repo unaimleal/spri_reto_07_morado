@@ -5,7 +5,7 @@
 
 
  
-    <div class="overlay text-white text-center">
+    <div class="overlay text-center">
     <br>
     <br>
     <br>
@@ -16,22 +16,30 @@
 
         <table id = table style=  "margin: 0 auto" "text-align: center;" border = 1px width = 70% >
             <tr>
-                <th>EMPRESA</th>
+                <th>B2B or B2C</th>
+                <th>Startup</th>
             </tr>
-            {% for row in row_data %}
             <tr >
-                {% for col, row_ in zip(column_names, row) %}
-
-                <td >{{row_}}</td>
-
-                {% endfor %}
+                <td >{{b2b_b2c}}</td>
+                <td >{{startup}}</td>
             </tr>
-            {% endfor %}
 
         </table><br>
         <a class="btn btn-lg btn-primary" href = "{{url_for('empresaval')}}">Nueva búsqueda</a><br>
     </div>
-
+    <br>
+    <br>
+    <div class="overlay text-center">
+<form action ="{{url_for('resultempresaval')}}" method="POST">
+    <label for = "empresaval" ><h2><strong> Seleccione el nombre de la empresa:</strong></h2></label>
+    <select name="empresaval" class="form-control form-control-lg custom-form-control">
+    {% for row in row_data %}
+    <option value="{{ row }}" class="form-control form-control-lg custom-form-control">{{ row }}</option>
+    {% endfor %}
+    </select><br>
+    <input type="submit" value="Realizar predicción" class="btn btn-lg btn-primary">
+</form>
+</div>
 <br>
 <br>
 <br>    
