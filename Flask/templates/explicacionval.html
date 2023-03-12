@@ -1,8 +1,19 @@
 {%extends "layout2.html"%}
 {%block cuerpo%}
-<h1>El modelo de validación</h1>
-<p>Explicar el modelo</p>
-<form action="{{url_for('explvalidacion')}}" method="POST">
-    <input type="submit" value="empezar">
-</form>
+
+<div style="text-align: center;">
+    <h1>El modelo de validación</h1>
+    <p>Crear una regla predictora de la valoración de las empresas en el año
+        2022.
+    </p>
+    <p> Esta limitación (el hecho de trabajar con la valoración del año
+        pasado, y no del 2023) se da debido a que no se dispone de la
+        información correspondiente al balance de un año concreto hasta el
+        primer trimestre del año siguiente, por lo que todavía no podemos
+        conocer los datos financieros correspondientes al año 2022.
+    </p>
+    <form action="{{url_for('explvalidacion')}}" method="POST">
+        <input type="submit" value="empezar">
+    </form>
+</div>
 {%endblock%}

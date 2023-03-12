@@ -89,7 +89,7 @@ def manualval():
 ###########################
 @app.route('/modeladquisicion', methods=['GET'])
 def expladquisicion():
-    return render_template('explicacionval.html')
+    return render_template('explicacionad.html')
 
 @app.route('/seleccionad', methods=['GET','POST'])
 def seleccionmetodoad():
