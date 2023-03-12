@@ -30,6 +30,7 @@ print(np.mean(df_valoracion['valuation_2022']))
 
 sql.crear_tabla()
 
+print(len(columnas_valoracion))
 app.secret_key = 'jshugk'
 
 @app.route('/')
@@ -103,7 +104,7 @@ def manualval():
         prediccion=modelo_regresion.predict(df_datos_val)
         prediccion=prediccion[0]
         print(prediccion)
-        return f'La prediccion de su empresa es: {prediccion}'
+        return render_template('predicciones.html',prediccion=prediccion,tipo='validación')
     return render_template('manualval.html',columnas=columnas_valoracion)
 
 b2b_b2c = list(df_valoracion['b2b_b2c'].unique())
@@ -133,9 +134,9 @@ def resultempresaval():
     empresa=request.form.get('empresaval')
     df_empresa_val=df_valoracion[df_valoracion['Nombre_sabi']==empresa]
     df_empresa_val=df_empresa_val.iloc[:,5:]
-    #prediccion=modelo_regresion.predict(df_empresa_val)
+    prediccion=modelo_regresion.predict(df_empresa_val)
     print(df_empresa_val,empresa)
-    #print(prediccion)
+    print(prediccion)
     return 'modelo'
 
 ###########################
@@ -158,12 +159,12 @@ def seleccionmetodoad():
 
 b2b_b2cad = list(df_adquisicion['b2b_b2c'].unique())
 startupad = list(df_adquisicion['startup'].unique())
-
+print(b2b_b2c,startup)
 @app.route("/empresad", methods=['GET','POST'])
 def empresad():
     if request.method=='POST':
-        b2=request.form.get('b2')
-        start=request.form.get('start')
+        b2=request.form.get('b2ad')
+        start=request.form.get('startad')
         startad=int(start)
         print(b2,type(startad))
         session['selectad_b2'] = b2
@@ -173,10 +174,8 @@ def empresad():
         for row in filtered_data:
             linead.append(row)
         print(filtered_data)
-        return render_template('resultempresad.html', row_datad=linead,b2b_b2c=b2,startup=startad)
-    return render_template('empresad.html', 
-                    b2b_b2cad = b2b_b2cad, 
-                    startupad = startupad)
+        return render_template('resultempresad.html', row_datad=linead, b2b_b2c=b2, startup=start)
+    return render_template('empresad.html',b2b_b2cad = b2b_b2cad,startupad = startupad)
 
 @app.route('/resultempresad', methods = ['POST'])
 def resultempresad():
@@ -200,11 +199,17 @@ def manualad():
         df_datos_ad=pd.DataFrame(df_datos_ad)
         prediccion=modelo_clasificacion.predict(df_datos_ad)
         if prediccion[0]==2:
-            return 'completamente adquirida'
+            url='adquirido.jpg'
+            situacion='ADQUIRIDA'
+            return render_template('adquirido.html',url=url,situacion=situacion)
         print(prediccion[0])
         if prediccion[0]==1:
-            return 'Parcialmente adquirido'
-        return 'Rechazado'
+            url='parcialmente.jpg'
+            situacion='PARCIALMENTE ADQUIRIDA'
+            return render_template('adquirido.html',url=url,situacion=situacion)
+        url='rechazado.jpg'
+        situacion='NO ADQUIRIDA'
+        return render_template('adquirido.html',url=url,situacion=situacion)
     return render_template('manualad.html', columnas=columnas_adquisicion)
 
 ############################

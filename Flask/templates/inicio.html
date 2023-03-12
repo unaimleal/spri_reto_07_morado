@@ -2,14 +2,14 @@
 
 
 {%block cuerpo%}
-<header id="home" class="header" style="background-image: url('static/main.jpg')">
+<header id="home" class="header">
     <div class="overlay text-white text-center">
         <h2 class="display-4 mb-5">Identifícate</h2>
 
         <div class="btn btn-lg ">
                 
                 <form action = "{{url_for('iniciosesion')}}" method = "POST" >
-                    <h3 >{{mens}}</h3><br>
+                    <h3 >{{mensaje}}</h3><br>
                     <input name = "usuario" type="text" id="booktable" class="form-control form-control-lg custom-form-control" placeholder="Nombre de ususario">
                     <input type="password" name="contraseña" class="form-control form-control-lg custom-form-control" placeholder="Contraseña">
                     <br>

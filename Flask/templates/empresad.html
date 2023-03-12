@@ -4,17 +4,18 @@
 
 <form action="{{url_for('empresad')}}" method="POST">
 
-    <label for = "b2" >Seleccionar si la empresa es b2b o b2c:</label>
-    <select name="b2" class="form-control form-control-lg custom-form-control">
-    {% for b2 in b2b_b2cad %}
-    <option value="{{ b2 }}" class="form-control form-control-lg custom-form-control">{{ b2 }}</option>
+    <label for = "b2ad" >Seleccionar si la empresa es b2b o b2c:</label>
+    
+    <select name="b2ad" class="form-control form-control-lg custom-form-control">
+    {% for b2ad in b2b_b2cad %}
+    <option value="{{b2ad}}" class="form-control form-control-lg custom-form-control">{{ b2ad }}</option>
     {% endfor %}
-    </select><br>
+</select><br>
 
-    <label for = "start" >Seleccionar si la empresa es una startup(1) o no(0):</label>
-    <select name = "start" class="form-control form-control-lg custom-form-control">
-    {% for start in startupad %}
-    <option value = "{{ start }}" class="form-control form-control-lg custom-form-control">{{ start }}</option>
+    <label for = "startad" >Seleccionar si la empresa es una startup(1) o no(0):</label>
+    <select name = "startad" class="form-control form-control-lg custom-form-control">
+    {% for startad in startupad %}
+    <option value = "{{startad}}" class="form-control form-control-lg custom-form-control">{{ startad }}</option>
     {% endfor %}
     </select><br>
 
