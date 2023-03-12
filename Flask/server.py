@@ -3,11 +3,13 @@ import bbdd.sqlite as sql
 import pandas as pd
 import pickle as pkl
 import os
+from sklearn.ensemble import RandomForestClassifier
+from xgboost import XGBRegressor
 
 CARPETA_MODELOS1 = "../modelos/clasificacion"
 CARPETA_MODELOS2 = "../modelos/regresion"
-modelo_clasificacion = pkl.load(open(os.path.join(CARPETA_MODELOS1,"modelo_lineal.pkl"),"rb"))
-modelo_regresion = pkl.load(open(os.path.join(CARPETA_MODELOS2,"modelo_lineal.pkl"),"rb"))
+modelo_clasificacion = pkl.load(open(os.path.join(CARPETA_MODELOS1,"rf_model.sav"),"rb"))
+modelo_regresion = pkl.load(open(os.path.join(CARPETA_MODELOS2,"gb_model.pkl"),"rb"))
 
 
 
@@ -67,7 +69,8 @@ def registro():
         return render_template('home.html', nombre=nombre)
 
     return render_template('registrarse.html')
-
+###########################
+# VALIDACION
 ###########################
 @app.route('/modelvalidacion', methods=['GET','POST'])
 def explvalidacion():
@@ -83,7 +86,7 @@ def seleccionmetodoval():
             return redirect(url_for('empresaval'))
         return redirect(url_for('manualval'))
     return render_template('seleccionmetodoval.html')
-################################
+
 @app.route('/manualval', methods=['GET','POST'])
 def manualval():
     if request.method=='POST':
@@ -94,10 +97,11 @@ def manualval():
             datos_val[i]=datos
         df_datos_val.append(datos_val)
         df_datos_val=pd.DataFrame(df_datos_val)
-        print(df_datos_val)
+        prediccion=modelo_regresion.predict(df_datos_val)
+        print(prediccion)
         return 'datos enviados'
     return render_template('manualval.html',columnas=columnas_valoracion)
-################################
+
 b2b_b2c = list(df_valoracion['b2b_b2c'].unique())
 startup = list(df_valoracion['startup'].unique())
 
@@ -122,10 +126,13 @@ def empresaval():
 
 @app.route('/resultempresaval', methods = ['POST'])
 def resultempresaval():
-    empresa=request.form.get('row')
-    print(empresa)
+    empresa=request.form.get('empresaval')
+    df_empresa=df_valoracion[df_valoracion['Nombre_sabi']==empresa]
+    print(df_empresa,empresa)
     return 'modelo'
-    
+
+###########################
+# ADQUISICION
 ###########################
 @app.route('/modeladquisicion', methods=['GET','POST'])
 def expladquisicion():
@@ -142,6 +149,28 @@ def seleccionmetodoad():
         return redirect(url_for('manualad'))
     return render_template('seleccionmetodoad.html')
 
+b2b_b2cad = list(df_adquisicion['b2b_b2c'].unique())
+startupad = list(df_adquisicion['startup'].unique())
+
+@app.route("/empresad", methods=['GET','POST'])
+def empresad():
+    if request.method=='POST':
+        b2=request.form.get('b2')
+        start=request.form.get('start')
+        select_start=int(start)
+        print(b2,type(select_start))
+        session['selectad_b2'] = b2
+        session['selectad_start'] = select_start
+        filtered_data = df_adquisicion[(df_adquisicion["b2b_b2c"] == b2) & (df_adquisicion["startup"] == select_start) ]['Nombre_sabi']
+        linea=[]
+        for row in filtered_data.unique():
+            linea.append(row)
+        print(linea)
+        return render_template('resultempresad.html', row_data=linea,b2b_b2c=b2,startup=start)
+    return render_template('empresad.html', 
+                    b2b_b2c = b2b_b2cad, 
+                    startup = startupad)
+
 @app.route('/manualad', methods=['GET','POST'])
 def manualad():
     if request.method=='POST':
@@ -152,8 +181,13 @@ def manualad():
             datos_ad[i]=datos
         df_datos_ad.append(datos_ad)
         df_datos_ad=pd.DataFrame(df_datos_ad)
-        print(df_datos_ad)
-        return 'datos enviados'
+        prediccion=modelo_clasificacion.predict(df_datos_ad)
+        if prediccion[0]==2:
+            return 'completamente adquirida'
+        print(prediccion[0])
+        if prediccion[0]==1:
+            return 'Parcialmente adquirido'
+        return 'Rechazado'
     return render_template('manualad.html', columnas=columnas_adquisicion)
 
 ############################
