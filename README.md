@@ -4,3 +4,14 @@ Este proyecto está enfocado en hacer predicciones sobre la valoración y adquis
 Este proyecto es esencial para el grupo Spri, ya que les permite tomar decisiones informadas sobre dónde invertir su dinero en el mundo de las startups. Además, también es útil para startups que buscan entender su valor actual y cómo pueden mejorar sus posibilidades de ser adquiridas en el futuro.
 
 El modelo ha sido entrenado y evaluado con un conjunto de datos reales de startups proporcionado por el propio grupo Spri. Se está trabajando en continuar mejorando el modelo y aumentar su precisión, a medida que haya más datos de startups en el futuro. 
+
+## Funcionamiento
+
+1. Clonar este repositorio
+2. Introducir los datos brutos disponibles en Mudle en la carpeta *Datos/Originales*
+3. Entra a la carpeta *influx_token*
+    1. Crea un fichero ***personal_token.txt*** que contenga solamente tu token de InfluxDB
+    2. Crea un fichero ***org_id.txt*** que contenga solamente el Org ID de tu organización de InfluxDB
+4. Ejecutar el script *principal.R*
+
+Cabe mencionar que al ejecutar el proyecto se creara automáticamente un *bucket* y los correspondientes *measurements* en tu repositorio de InfluxDB. Posteriormente, las consultas que van a efectuar los scripts apuntarán a este *bucket*.
