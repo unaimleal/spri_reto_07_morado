@@ -1,5 +1,28 @@
 {%extends "layout2.html"%}
-{%block cuerpo%}
-<h1>Elige la empresa</h1>
 
-{%endblock%}
+{%block cuerpo%} 
+
+
+<form action="{{url_for('resultempresaval')}}" method="POST">
+
+    <label for = "b2" >Seleccionar si la empresa es b2b o b2c:</label>
+    <select name="b2" class="form-control form-control-lg custom-form-control">
+    {% for b2 in b2b_b2c %}
+    <option value="{{ b2 }}" class="form-control form-control-lg custom-form-control">{{ b2 }}</option>
+    {% endfor %}
+    </select><br>
+
+    <label for = "start" >Seleccionar si la empresa es una startup(1) o no(0):</label>
+    <select name = "start" class="form-control form-control-lg custom-form-control">
+    {% for start in startup %}
+    <option value = "{{ start }}" class="form-control form-control-lg custom-form-control">{{ start }}</option>
+    {% endfor %}
+    </select><br>
+
+    <button type="submit" value="Filtrar" class="btn btn-lg btn-primary" >Filtrar</button>
+
+</form>
+
+        
+{%endblock%} 
+    

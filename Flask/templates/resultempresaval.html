@@ -1,0 +1,41 @@
+{%extends "layout2.html"%}
+
+
+{%block cuerpo%} 
+
+
+ 
+    <div class="overlay text-white text-center">
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <h3><strong> Las empresas que cumplen los requisitos son:</strong></h3><br>
+
+        <table id = table style=  "margin: 0 auto" "text-align: center;" border = 1px width = 70% >
+            <tr>
+                <th>EMPRESA</th>
+            </tr>
+            {% for row in row_data %}
+            <tr >
+                {% for col, row_ in zip(column_names, row) %}
+
+                <td >{{row_}}</td>
+
+                {% endfor %}
+            </tr>
+            {% endfor %}
+
+        </table><br>
+        <a class="btn btn-lg btn-primary" href = "{{url_for('empresaval')}}">Nueva búsqueda</a><br>
+    </div>
+
+<br>
+<br>
+<br>    
+<br>
+<br>
+<br>  
+{%endblock%} 

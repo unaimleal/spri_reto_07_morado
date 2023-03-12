@@ -1,12 +1,17 @@
-{%extends "layout2.html"%}
-{%block cuerpo%}
-<h1>Ingresa los siguientes datos:</h1>
-<form action="{{url_for('manualad')}}" method="POST">
-    {% for colum in columnas %}
-    <input type="number" name="{{ colum }}" placeholder="{{ colum }}" required><br>
-    {% endfor %}
-    <input type="submit" value="Enviar">
-  </form>
-<input type="submit" value="Enviar">
 
-{%endblock%}
+{% extends "layout2.html" %}
+  
+{% block cuerpo %}
+  <form action="{{ url_for('manualad') }}" method="POST">
+      <h1>Ingresa los siguientes datos:</h1>
+      <div class="overlay text-white text-center">
+          <div class="options">
+            {% for column in columnas %}
+              <input type="number" name="{{ column }}" placeholder="{{ column }}" required><br>
+              <br>
+            {% endfor %}
+          </div>
+          <input type="submit" value="Enviar">
+        </div>
+      </form>
+{% endblock %}
