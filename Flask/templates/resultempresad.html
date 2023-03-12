@@ -33,7 +33,7 @@
 <form action ="{{url_for('resultempresad')}}" method="POST">
     <label for = "empresad" ><h2><strong> Seleccione el nombre de la empresa:</strong></h2></label>
     <select name="empresad" class="form-control form-control-lg custom-form-control">
-    {% for row in row_data %}
+    {% for row in row_datad %}
     <option value="{{ row }}" class="form-control form-control-lg custom-form-control">{{ row }}</option>
     {% endfor %}
     </select><br>

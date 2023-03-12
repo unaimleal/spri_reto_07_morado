@@ -9,14 +9,14 @@ from xgboost import XGBRegressor
 CARPETA_MODELOS1 = "../modelos/clasificacion"
 CARPETA_MODELOS2 = "../modelos/regresion"
 modelo_clasificacion = pkl.load(open(os.path.join(CARPETA_MODELOS1,"rf_model.sav"),"rb"))
-modelo_regresion = pkl.load(open(os.path.join(CARPETA_MODELOS2,"gb_model.pkl"),"rb"))
+modelo_regresion = pkl.load(open(os.path.join(CARPETA_MODELOS2,"xgb_model.pkl"),"rb"))
 
 
 
 app = Flask(__name__)
-columnas_valoracion=['Precio/Venta','Activo circulante mil EUR_2021','Fondos propios mil EUR_2021','Total activo mil EUR_2021','Total pasivo y capital propio mil EUR_2021',
+columnas_valoracion=['Activo circulante mil EUR_2021','Fondos propios mil EUR_2021','Total activo mil EUR_2021','Total pasivo y capital propio mil EUR_2021',
  'Fondo de maniobra mil EUR_2021','Deudores mil EUR_2021','Beneficio neto mil EUR','Ingresos de explotacion mil EUR_2021','Importe neto Cifra de Ventas mil EUR_2021','Pasivo liquido mil EUR_2021','Total pasivo_2021',
- 'total_funding','Pasivo fijo mil EUR_2021','Gastos financieros mil EUR_2021','Resultado Explotacion mil EUR_2021','EBIT mil EUR_2021','PER','Resultado del Ejercicio mil EUR_2021','Result. ordinarios antes Impuestos mil EUR_2021','Importe neto Cifra de Ventas mil EUR_ratio']
+ 'total_funding','Pasivo fijo mil EUR_2021','Gastos financieros mil EUR_2021','Resultado Explotacion mil EUR_2021','EBIT mil EUR_2021','Resultado del Ejercicio mil EUR_2021','Result. ordinarios antes Impuestos mil EUR_2021','Importe neto Cifra de Ventas mil EUR_ratio']
 
 columnas_adquisicion=['Anos en Mercado','Cash flow mil EUR_2021','EBITDA mil EUR_2021','Inmovilizado mil EUR_2021','Fondos propios mil EUR_2021',
  'Valor agregado mil EUR_2021','Total pasivo_ratio','Inmovilizado mil EUR_ratio','Capital suscrito mil EUR_2021','Capital social mil EUR',
@@ -127,8 +127,8 @@ def empresaval():
 @app.route('/resultempresaval', methods = ['POST'])
 def resultempresaval():
     empresa=request.form.get('empresaval')
-    df_empresa=df_valoracion[df_valoracion['Nombre_sabi']==empresa]
-    print(df_empresa,empresa)
+    df_empresa_val=df_valoracion[df_valoracion['Nombre_sabi']==empresa]
+    print(df_empresa_val,empresa)
     return 'modelo'
 
 ###########################
@@ -157,19 +157,29 @@ def empresad():
     if request.method=='POST':
         b2=request.form.get('b2')
         start=request.form.get('start')
-        select_start=int(start)
-        print(b2,type(select_start))
+        startad=int(start)
+        print(b2,type(startad))
         session['selectad_b2'] = b2
-        session['selectad_start'] = select_start
-        filtered_data = df_adquisicion[(df_adquisicion["b2b_b2c"] == b2) & (df_adquisicion["startup"] == select_start) ]['Nombre_sabi']
-        linea=[]
-        for row in filtered_data.unique():
-            linea.append(row)
-        print(linea)
-        return render_template('resultempresad.html', row_data=linea,b2b_b2c=b2,startup=start)
+        session['selectad_start'] = startad
+        filtered_data = df_adquisicion[(df_adquisicion["b2b_b2c"] == b2) & (df_adquisicion["startup"] == startad)]['Nombre_sabi']
+        linead=[]
+        for row in filtered_data:
+            linead.append(row)
+        print(filtered_data)
+        return render_template('resultempresad.html', row_datad=linead,b2b_b2c=b2,startup=startad)
     return render_template('empresad.html', 
-                    b2b_b2c = b2b_b2cad, 
-                    startup = startupad)
+                    b2b_b2cad = b2b_b2cad, 
+                    startupad = startupad)
+
+@app.route('/resultempresad', methods = ['POST'])
+def resultempresad():
+    empresa=request.form.get('empresad')
+    df_empresa_ad=df_adquisicion[df_adquisicion['Nombre_sabi']==empresa]
+    df_empresa_ad=df_empresa_ad.iloc[:,4:-1]
+    prediccion=modelo_clasificacion.predict(df_empresa_ad)
+    print(df_empresa_ad,empresa)
+    print(prediccion)
+    return 'modelo'
 
 @app.route('/manualad', methods=['GET','POST'])
 def manualad():
