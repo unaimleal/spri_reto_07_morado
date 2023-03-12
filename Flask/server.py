@@ -13,6 +13,9 @@ columnas_adquisicion=['Anos en Mercado','Cash flow mil EUR_2021','EBITDA mil EUR
  'Gastos financieros mil EUR_ratio','Gastos de personal mil EUR_2021','Resultado financiero mil EUR_ratio','Total pasivo y capital propio mil EUR_2021','Total activo mil EUR_2021',
  'Gastos financieros mil EUR_2021','Pasivo fijo mil EUR_2021','total_funding']
 
+df_valoracion = pd.read_csv('../Datos/Limpios/df_valoracion.csv')
+df_adquisicion = pd.read_csv('../Datos/Limpios/df_adquisicion.csv')
+
 sql.crear_tabla()
 
 app.secret_key = 'jshugk'
@@ -69,10 +72,10 @@ def seleccionmetodoval():
     if request.method=='POST':
         metodo=request.form.get('metodo')
         if metodo=='empresa':
-            return render_template('empresval.html')
+            return redirect(url_for('empresaval'))
         return redirect(url_for('manualval'))
     return render_template('seleccionmetodoval.html')
-
+################################
 @app.route('/manualval', methods=['GET','POST'])
 def manualval():
     if request.method=='POST':
@@ -86,9 +89,40 @@ def manualval():
         print(df_datos_val)
         return 'datos enviados'
     return render_template('manualval.html',columnas=columnas_valoracion)
+################################
+b2b_b2c = list(df_valoracion['b2b_b2c'].unique())
+startup = list(df_valoracion['startup'].unique())
+
+@app.route("/empresaval", methods=['GET','POST'])
+def empresaval():
+    if request.method=='POST':
+        b2=request.form.get('b2')
+        start=request.form.get('start')
+        select_start=int(start)
+        print(b2,type(select_start))
+        session['selected_b2'] = b2
+        session['selected_start'] = select_start
+        filtered_data = df_valoracion[(df_valoracion["b2b_b2c"] == b2) & (df_valoracion["startup"] == select_start) ]['Nombre_sabi']
+        linea=[]
+        for row in filtered_data.unique():
+            linea.append(row)
+        print(linea)
+        return render_template('resultempresaval.html', row_data=linea,b2b_b2c=b2,startup=start)
+    return render_template('empresaval.html', 
+                    b2b_b2c = b2b_b2c, 
+                    startup = startup)
+
+@app.route('/resultempresaval', methods = ['POST'])
+def resultempresaval():
+    empresa=request.form.get('row')
+    print(empresa)
+    return 'modelo'
+    
 ###########################
-@app.route('/modeladquisicion', methods=['GET'])
+@app.route('/modeladquisicion', methods=['GET','POST'])
 def expladquisicion():
+    if request.method=='POST':
+         return redirect(url_for('seleccionmetodoad'))
     return render_template('explicacionad.html')
 
 @app.route('/seleccionad', methods=['GET','POST'])
@@ -97,8 +131,8 @@ def seleccionmetodoad():
         metodo=request.form.get('metodo')
         if metodo=='empresa':
             return render_template('empresad.html')
-        return render_template('manualad.html')
-    return render_template('selccionmetodoad.html')
+        return redirect(url_for('manualad'))
+    return render_template('seleccionmetodoad.html')
 
 @app.route('/manualad', methods=['GET','POST'])
 def manualad():
@@ -112,7 +146,8 @@ def manualad():
         df_datos_ad=pd.DataFrame(df_datos_ad)
         print(df_datos_ad)
         return 'datos enviados'
-    return render_template('manualval.html', columnas=columnas_adquisicion)
+    return render_template('manualad.html', columnas=columnas_adquisicion)
+
 ############################
 @app.route('/visualizarmodelos', methods=['GET','POST'])
 def selecvisualizar():
