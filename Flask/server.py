@@ -125,6 +125,8 @@ def manualval():
         df_datos_val=df_datos_val.apply(lambda x: x.astype('float64'))
         prediccion=modelo_regresion.predict(df_datos_val)
         prediccion=prediccion[0]
+        prediccion = round(float(prediccion) * 1000000, 0)
+        prediccion = "{:,.0f}".format(prediccion, decimal=',', thousands='.')
         print(prediccion)
         return render_template('predicciones.html',prediccion=prediccion,tipo='validación')
     return render_template('manualval.html',columnas=columnas_valoracion)
@@ -158,7 +160,8 @@ def resultempresaval():
     df_empresa_val=df_empresa_val.iloc[:,5:]
     prediccion=modelo_regresion.predict(df_empresa_val)
     prediccion=prediccion[0]
-    prediccion=float(prediccion)*1000000
+    prediccion = round(float(prediccion) * 1000000, 0)
+    prediccion = "{:,.0f}".format(prediccion, decimal=',', thousands='.')
     print(df_empresa_val,empresa)
     sql.guardar_empresa_valoracion(session['usuario'],empresa,prediccion)
     return render_template('predicciones.html',prediccion=prediccion,tipo='validación')

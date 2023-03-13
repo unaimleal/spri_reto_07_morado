@@ -9631,7 +9631,7 @@ blockquote {
   tr,
 img {
     page-break-inside: avoid;
-  }
+  } 
 
   p,
 h2,
@@ -9791,6 +9791,51 @@ h6 {
   border-color: #ffffff transparent transparent transparent;
   z-index: 2;
 }
+#tabla {
+  border-collapse: collapse;
+  margin: 0 auto;
+  max-width: 800px;
+  width: 100%;
+}
+
+#tabla th,
+#tabla td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+#tabla th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+#tabla tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+#tabla2 {
+  border-collapse: collapse;
+  margin: 0 auto;
+  max-width: 800px;
+  width: 100%;
+}
+
+#tabla2 th,
+#tabla2 td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+ 
+#tabla2 th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+#tabla2 tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
 
 .testimonial-text::after {
   position: absolute;
@@ -9827,6 +9872,51 @@ h6 {
   padding: 0;
   list-style-type: none;
 }
+
+.my-form-class {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.my-form-class input[type="number"] {
+  width: 100%;
+  max-width: 600px;
+  height: 40px;
+  padding: 10px 20px;
+  margin-bottom: 3px;
+  margin-right: 10px;
+  font-size: 16px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.my-form-class input[type="submit"] {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin-top: 10px;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.my-form-class input[type="submit"]:hover {
+  background-color: #45a049;
+}
+
+/* Reduce la distancia entre las filas */
+.my-form-class .options {
+  margin-bottom: 5px;
+}
+
+/* Aumenta la distancia entre las columnas */
+.my-form-class .options input[type="number"] {
+  margin-right: 50px;
+}
+
+
+
 
 @media (max-width: 767.98px) {
   .contact-form {

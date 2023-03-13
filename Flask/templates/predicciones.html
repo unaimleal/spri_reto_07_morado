@@ -1,7 +1,9 @@
 {%extends 'layout2.html' %}
 {%block cuerpo%}
 <div class="btn btn-lg ">
- <p>La prediccion para tu empresa de {{tipo}} es: {{prediccion}}</p>
+ <p>La prediccion para tu empresa de {{tipo}} es: <strong style="font-size: xx-large; color: black;">{{prediccion}}€</strong></p>
 </div>
-<a href="{{url_for('resultadosval')}}">Visualizar resultados</a>
+<br>
+<br>
+<a href="{{url_for('resultadosval')}}">   Visualizar resultados</a>
 {%endblock%}
