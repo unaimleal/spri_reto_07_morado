@@ -47,17 +47,7 @@ def comprobar_contraseña(usuario:str,contraseña:str):
     contra=cur.fetchone()[0]
     con.close()
     return contraseña == contra
-######## antes de entregar borrar!!!!!!!!!!!!!!
-def consultar_usu():
-    con = sqlite.connect(bbdd) 
-    cur = con.cursor() 
-    cur.execute("SELECT * FROM usuarios")
-    usu= cur.fetchall()
-    con.close()  
 
-    return usu
-
-###############
 
 
 

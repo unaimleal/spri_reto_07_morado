@@ -276,12 +276,5 @@ def selecvisualizar():
     return render_template('selecvisualizar.html')
 
 
-
-############# Para ver los usuatios y contraseñas #antes de entragar borrar!!!!!!!
-@app.route('/consultar')
-def consultar():
-    registro=sql.consultar_usu()
-    return render_template('contraseñayusuario.html', registro=registro)
-
 if __name__ == "__main__":
     app.run(debug = True)
