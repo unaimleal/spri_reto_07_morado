@@ -1,0 +1,17 @@
+{%extends 'layout2.html' %}
+{%block cuerpo%}
+
+<table id="tabla">
+    <thead>
+        <th>Empresa</th>
+        <th>Prediccion</th>
+    </thead>
+    {%for val in resultado%}
+    <tr>
+        {%for per in val%}
+        <td>{{per}}</td>
+        {%endfor%}
+    </tr>
+    {%endfor%}
+</table>
+{%endblock%}

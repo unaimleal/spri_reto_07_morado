@@ -20,8 +20,8 @@
                 <th>Startup</th>
             </tr>
             <tr >
-                <td >{{b2b_b2cad}}</td>
-                <td >{{startupad}}</td>
+                <td >{{b2b_b2c}}</td>
+                <td >{{startup}}</td>
             </tr>
 
         </table><br>
@@ -33,7 +33,7 @@
 <form action ="{{url_for('resultempresad')}}" method="POST">
     <label for = "empresad" ><h2><strong> Seleccione el nombre de la empresa:</strong></h2></label>
     <select name="empresad" class="form-control form-control-lg custom-form-control">
-    {% for row in row_datad %}
+    {% for row in row_data %}
     <option value="{{ row }}" class="form-control form-control-lg custom-form-control">{{ row }}</option>
     {% endfor %}
     </select><br>

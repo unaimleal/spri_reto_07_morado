@@ -10,16 +10,37 @@ import numpy as np
 CARPETA_MODELOS1 = "../modelos/clasificacion"
 CARPETA_MODELOS2 = "../modelos/regresion"
 modelo_clasificacion = pkl.load(open(os.path.join(CARPETA_MODELOS1,"rf_model.sav"),"rb"))
-modelo_regresion = pkl.load(open(os.path.join(CARPETA_MODELOS2,"xgb_model.pkl"),"rb"))
+modelo_regresion = pkl.load(open(os.path.join(CARPETA_MODELOS2,"rf_model.pkl"),"rb"))
 
 
 
 app = Flask(__name__)
-columnas_valoracion=['Activo circulante mil EUR_2021','Fondos propios mil EUR_2021','Total activo mil EUR_2021','Total pasivo y capital propio mil EUR_2021',
- 'Fondo de maniobra mil EUR_2021','Deudores mil EUR_2021','Beneficio neto mil EUR','Ingresos de explotacion mil EUR_2021','Importe neto Cifra de Ventas mil EUR_2021','Pasivo liquido mil EUR_2021','Total pasivo_2021',
- 'total_funding','Pasivo fijo mil EUR_2021','Gastos financieros mil EUR_2021','Resultado Explotacion mil EUR_2021','EBIT mil EUR_2021','Resultado del Ejercicio mil EUR_2021','Result. ordinarios antes Impuestos mil EUR_2021','Importe neto Cifra de Ventas mil EUR_ratio']
+columnas_valoracion=['Total activo mil EUR_2021',
+ 'Activo circulante mil EUR_2021',
+ 'Fondos propios mil EUR_2021',
+ 'Total pasivo y capital propio mil EUR_2021',
+ 'Fondo de maniobra mil EUR_2021',
+ 'Deudores mil EUR_2021',
+ 'Beneficio neto mil EUR',
+ 'Ingresos de explotacion mil EUR_2021',
+ 'Importe neto Cifra de Ventas mil EUR_2021',
+ 'Pasivo liquido mil EUR_2021',
+ 'Total pasivo_2021',
+ 'total_funding',
+ 'Pasivo fijo mil EUR_2021',
+ 'Gastos financieros mil EUR_2021',
+ 'Resultado Explotacion mil EUR_2021',
+ 'EBIT mil EUR_2021',
+ 'Resultado del Ejercicio mil EUR_2021',
+ 'Result. ordinarios antes Impuestos mil EUR_2021',
+ 'Importe neto Cifra de Ventas mil EUR_ratio']
 
 columnas_adquisicion=['Anos en Mercado','Cash flow mil EUR_2021','EBITDA mil EUR_2021','Inmovilizado mil EUR_2021','Fondos propios mil EUR_2021',
+ 'Valor agregado mil EUR_2021','Total pasivo_ratio','Inmovilizado mil EUR_ratio','Capital suscrito mil EUR_2021','Capital social mil EUR',
+ 'Gastos financieros mil EUR_ratio','Gastos de personal mil EUR_2021','Resultado financiero mil EUR_ratio','Total pasivo y capital propio mil EUR_2021','Total activo mil EUR_2021',
+ 'Gastos financieros mil EUR_2021','Pasivo fijo mil EUR_2021','total_funding']
+
+columnas_adsqlite=['usuario','Anos en Mercado','Cash flow mil EUR_2021','EBITDA mil EUR_2021','Inmovilizado mil EUR_2021','Fondos propios mil EUR_2021',
  'Valor agregado mil EUR_2021','Total pasivo_ratio','Inmovilizado mil EUR_ratio','Capital suscrito mil EUR_2021','Capital social mil EUR',
  'Gastos financieros mil EUR_ratio','Gastos de personal mil EUR_2021','Resultado financiero mil EUR_ratio','Total pasivo y capital propio mil EUR_2021','Total activo mil EUR_2021',
  'Gastos financieros mil EUR_2021','Pasivo fijo mil EUR_2021','total_funding']
@@ -29,7 +50,8 @@ df_adquisicion = pd.read_csv('../Datos/Limpios/df_adquisicion.csv')
 print(np.mean(df_valoracion['valuation_2022']))
 
 sql.crear_tabla()
-
+sql.crear_tabla_empresa_adquisicion()
+sql.crear_tabla_empresa_valoracion()
 print(len(columnas_valoracion))
 app.secret_key = 'jshugk'
 
@@ -109,7 +131,7 @@ def manualval():
 
 b2b_b2c = list(df_valoracion['b2b_b2c'].unique())
 startup = list(df_valoracion['startup'].unique())
-
+df_valoracion=df_valoracion.drop(['PER','Precio/Venta'],axis=1)
 @app.route("/empresaval", methods=['GET','POST'])
 def empresaval():
     if request.method=='POST':
@@ -135,9 +157,16 @@ def resultempresaval():
     df_empresa_val=df_valoracion[df_valoracion['Nombre_sabi']==empresa]
     df_empresa_val=df_empresa_val.iloc[:,5:]
     prediccion=modelo_regresion.predict(df_empresa_val)
+    prediccion=prediccion[0]
+    prediccion=float(prediccion)*1000000
     print(df_empresa_val,empresa)
-    print(prediccion)
-    return 'modelo'
+    sql.guardar_empresa_valoracion(session['usuario'],empresa,prediccion)
+    return render_template('predicciones.html',prediccion=prediccion,tipo='validación')
+
+@app.route('/resultadosval')
+def resultadosval():
+    resultado=sql.ver_empresa_valoracion(session['usuario'])
+    return render_template('resultados.html',resultado=resultado)
 
 ###########################
 # ADQUISICION
@@ -153,39 +182,57 @@ def seleccionmetodoad():
     if request.method=='POST':
         metodo=request.form.get('metodo')
         if metodo=='empresa':
-            return render_template('empresad.html')
+            return redirect(url_for('empresad'))
         return redirect(url_for('manualad'))
     return render_template('seleccionmetodoad.html')
 
-b2b_b2cad = list(df_adquisicion['b2b_b2c'].unique())
-startupad = list(df_adquisicion['startup'].unique())
-print(b2b_b2c,startup)
+b2b_b2c= list(df_valoracion['b2b_b2c'].unique())
+startup = list(df_valoracion['startup'].unique())
+
 @app.route("/empresad", methods=['GET','POST'])
 def empresad():
     if request.method=='POST':
-        b2=request.form.get('b2ad')
-        start=request.form.get('startad')
-        startad=int(start)
-        print(b2,type(startad))
-        session['selectad_b2'] = b2
-        session['selectad_start'] = startad
-        filtered_data = df_adquisicion[(df_adquisicion["b2b_b2c"] == b2) & (df_adquisicion["startup"] == startad)]['Nombre_sabi']
-        linead=[]
-        for row in filtered_data:
-            linead.append(row)
-        print(filtered_data)
-        return render_template('resultempresad.html', row_datad=linead, b2b_b2c=b2, startup=start)
-    return render_template('empresad.html',b2b_b2cad = b2b_b2cad,startupad = startupad)
+        b2=request.form.get('b2')
+        start=request.form.get('start')
+        select_start=int(start)
+        session['selected_b2ad'] = b2
+        session['selected_startad'] = select_start
+        filtered_data = df_adquisicion[(df_adquisicion["b2b_b2c"] == b2) & (df_adquisicion["startup"] == select_start) ]['Nombre_sabi']
+        linea=[]
+        for row in filtered_data.unique():
+            linea.append(row)
+        return render_template('resultempresad.html', row_data=linea,b2b_b2c=b2,startup=start)
+    if request.method=='GET':
+        return render_template('empresad.html', 
+                        b2b_b2c = b2b_b2c, 
+                        startup = startup)
 
 @app.route('/resultempresad', methods = ['POST'])
 def resultempresad():
     empresa=request.form.get('empresad')
     df_empresa_ad=df_adquisicion[df_adquisicion['Nombre_sabi']==empresa]
     df_empresa_ad=df_empresa_ad.iloc[:,4:-1]
-    prediccion=modelo_clasificacion.predict(df_empresa_ad)
-    print(df_empresa_ad,empresa)
-    print(prediccion)
-    return 'modelo'
+    prediccion2=modelo_clasificacion.predict(df_empresa_ad)
+    prediccion2=prediccion2[0]
+    print(prediccion2)
+    if prediccion2==2:
+        url='adquirido.jpg'
+        situacion='ADQUIRIDA'
+        sql.guardar_empresa_adquisicion(session['usuario'],empresa,situacion)
+        return render_template('adquirido.html',url=url,situacion=situacion)
+    if prediccion2==1:
+        url='parcialmente.jpg'
+        situacion='PARCIALMENTE ADQUIRIDA'
+        sql.guardar_empresa_adquisicion(session['usuario'],empresa,situacion)
+        return render_template('adquirido.html',url=url,situacion=situacion)
+    if prediccion2==0:
+        url='rechazado.jpg'
+        situacion='NO ADQUIRIDA'
+        sql.guardar_empresa_adquisicion(session['usuario'],empresa,situacion)
+        return render_template('adquirido.html',url=url,situacion=situacion)
+    
+       
+
 
 @app.route('/manualad', methods=['GET','POST'])
 def manualad():
@@ -207,10 +254,16 @@ def manualad():
             url='parcialmente.jpg'
             situacion='PARCIALMENTE ADQUIRIDA'
             return render_template('adquirido.html',url=url,situacion=situacion)
-        url='rechazado.jpg'
-        situacion='NO ADQUIRIDA'
-        return render_template('adquirido.html',url=url,situacion=situacion)
+        if prediccion[0]==0:
+            url='rechazado.jpg'
+            situacion='NO ADQUIRIDA'
+            return render_template('adquirido.html',url=url,situacion=situacion)
     return render_template('manualad.html', columnas=columnas_adquisicion)
+
+@app.route('/resultadosad')
+def resultadosad():
+    resultado=sql.ver_empresa_adquisicion(session['usuario'])
+    return render_template('resultados.html',resultado=resultado)
 
 ############################
 @app.route('/visualizarmodelos', methods=['GET','POST'])
